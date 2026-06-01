@@ -1,3 +1,5 @@
+'use server'
+import React from 'react'
 import { authConfig } from "../../configs/auth";
 import { getServerSession } from "next-auth";
 import { prisma } from '@/lib/prisma'; 
@@ -13,7 +15,6 @@ export default async function Library() {
         );
     }
 
-   
     const libraryItems = await prisma.library.findMany({
         where: { user_id: Number(session.user.id) },
         include: {
@@ -25,9 +26,9 @@ export default async function Library() {
         <div className="w-full mt-27 pl-2 pr-2 lg:pl-10 lg:pr-10"> 
             <h1 className="font-inder text-3xl mb-8">My Games</h1>
 
-             <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 md:gap-8">
+            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 md:gap-8">
                 {libraryItems.length > 0 ? (
-                    libraryItems.map((item) => {
+                    libraryItems.map((item: typeof libraryItems[number]) => {
                         const game = item.game; 
                         if (!game) return null; 
 
@@ -52,7 +53,7 @@ export default async function Library() {
                 )}
             </div>
             {/* Phone */}
-                <div className='lg:hidden w-full h-20'></div>
+            <div className='lg:hidden w-full h-20'></div>
         </div>
     );
 }
