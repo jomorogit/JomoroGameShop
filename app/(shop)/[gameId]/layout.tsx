@@ -13,7 +13,9 @@ import Languages from "@/app/components/Languages";
 import SeeMore from "@/app/components/SeeMore";
 import ScrollToTop from '@/app/hooks/ScrollTop';
 import AddToCartWidget from '@/app/components/AddToCartWidget';
-
+type PrismaGameIdResult = {
+  game_id: number;
+};
 export default async function GameLayout({
   children,
   params
@@ -25,6 +27,7 @@ export default async function GameLayout({
   const { gameId } = await params;
   const idFromUrl = parseInt(gameId.split('-')[0]);
   let cartGameIds: number[] = [];
+  let LibraryGameIds: number[] = [];
   if (isNaN(idFromUrl)) return notFound();
 
   const game = await prisma.game.findUnique({
@@ -42,12 +45,12 @@ export default async function GameLayout({
     });
 
     if (userFromDb) {
-      // Одним запросом берем все ID из корзины 🧺
+      // Одним запросом берем все ID из корзины
       const cartItems = await prisma.cart.findMany({
         where: { user_id: userFromDb.id },
         select: { game_id: true }
       });
-      cartGameIds = cartItems.map(item => item.game_id);
+      cartGameIds = cartItems.map((item: PrismaGameIdResult) => item.game_id);
     }
 
     if (userFromDb) {
@@ -56,7 +59,7 @@ export default async function GameLayout({
         where: { user_id: userFromDb.id },
         select: { game_id: true }
       });
-      cartGameIds = LibraryItems.map(item => item.game_id);
+      LibraryGameIds = LibraryItems.map((item: PrismaGameIdResult) => item.game_id);
     }
   }
       
@@ -111,7 +114,7 @@ export default async function GameLayout({
             {/* 4. Блок покупки =*/}
             <div className="order-4 lg:order-none bg-[#23122E] p-6 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-4">
               <h2 className="text-2xl font-medium">Buy {game.title}</h2>
-              <AddToCartButton gameID={game.id} price={game.price_eur.toNumber()} initialIsOnCart={cartGameIds.includes(game.id)} initialIsOnLibrary={cartGameIds.includes(game.id)}/>
+              <AddToCartButton gameID={game.id} price={game.price_eur.toNumber()} initialIsOnCart={cartGameIds.includes(game.id)} initialIsOnLibrary={LibraryGameIds.includes(game.id)}/>
             </div>
 
             {/* 5. Ссылки и описание*/}
@@ -191,7 +194,7 @@ export default async function GameLayout({
         
         
       </div>
-      <AddToCartWidget price={Number(game.price_eur) || 0} gameID={game.id} initialIsOnLibrary={cartGameIds.includes(game.id)}/>
+      <AddToCartWidget price={Number(game.price_eur) || 0} gameID={game.id} initialIsOnLibrary={LibraryGameIds.includes(game.id)}/>
     </Provider>
   );
 }
