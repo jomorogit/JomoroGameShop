@@ -65,13 +65,12 @@ export default async function GameLayout({
       
   if (!game) return notFound();
 
-  const mediaForSlider = game.game_media.map(({ id, img_url }) => ({
-    id: id,
+  const mediaForSlider = game.game_media.map((m: typeof game.game_media[number]) => ({
+    id: m.id,
     type: 'image' as const,
-    src: img_url || '',
+    src: m.img_url || '',
     alt: game.title
   }));
-
 
 
   return (
