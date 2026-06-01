@@ -1,0 +1,276 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Game {
+  id                  Int                 @id @default(autoincrement())
+  title               String
+  price_eur           Decimal             @db.Decimal(10, 2)
+  release_date        DateTime?           @db.Date
+  developer           String?
+  publisher           String?
+  game_description    String?
+  features            String?
+  main_img            String?
+  rating_summary      Decimal?            @db.Decimal(3, 1)
+  total_reviews       Int?                @default(0)
+  discount_percent    Int?                @default(0)
+  discount_end_date   DateTime?           @db.Timestamp(6)
+  about_game_img      String?
+  about_game          String?
+  card_img            String?
+  cart                Cart[]
+  game_genres         GameGenre[]
+  game_languages      GameLanguage[]
+  game_media          GameMedia[]
+  library             Library[]
+  reviews             Review[]
+  system_requirements SystemRequirement[]
+  transaction_games   TransactionGames[]
+  wishlist            Wishlist[]
+
+  @@map("games")
+}
+
+model Cart {
+  user_id  Int
+  game_id  Int
+  added_at DateTime? @default(now()) @db.Timestamp(6)
+  game     Game      @relation(fields: [game_id], references: [id], onDelete: Cascade)
+  user     User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@id([user_id, game_id])
+  @@map("cart")
+}
+
+model Library {
+  game_id            Int
+  user_id            Int
+  purchase_price_eur Decimal?  @db.Decimal(10, 2)
+  added_at           DateTime? @default(now()) @db.Timestamp(6)
+  is_installed       Boolean?  @default(false)
+  is_favorite        Boolean?  @default(false)
+  game               Game      @relation(fields: [game_id], references: [id], onDelete: Cascade)
+  user               User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@id([game_id, user_id])
+  @@map("library")
+}
+
+model Wishlist {
+  game_id  Int
+  user_id  Int
+  added_at DateTime? @default(now()) @db.Timestamp(6)
+  game     Game      @relation(fields: [game_id], references: [id], onDelete: Cascade)
+  user     User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@id([game_id, user_id])
+  @@map("wishlist")
+}
+
+enum ReactionType {
+  LIKE
+  DISLIKE
+}
+
+model Review {
+  id             Int              @id @default(autoincrement())
+  game_id        Int
+  user_id        Int
+  is_recommended Boolean          @default(true)
+  content        String           @db.Text
+  created_at     DateTime?        @default(now()) @db.Timestamp(6)
+  updated_at     DateTime?        @updatedAt @db.Timestamp(6)
+  reactions      ReviewReaction[]
+  game           Game             @relation(fields: [game_id], references: [id], onDelete: Cascade)
+  user           User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([game_id, user_id])
+  @@map("reviews")
+}
+
+model ReviewReaction {
+  id        Int          @id @default(autoincrement())
+  review_id Int
+  user_id   Int
+  type      ReactionType
+  review    Review       @relation(fields: [review_id], references: [id], onDelete: Cascade)
+  user      User         @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([review_id, user_id])
+  @@map("review_reactions")
+}
+
+model Transaction {
+  id                Int                @id @default(autoincrement())
+  user_id           Int?               
+  stripe_session_id String             @unique
+  amount_eur        Decimal            @db.Decimal(10, 2)
+  payment_type      PaymentAction
+  created_at        DateTime           @default(now()) @db.Timestamp(6)
+  user              User?              @relation(fields: [user_id], references: [id], onDelete: SetNull) 
+  transaction_games TransactionGames[]
+
+  @@map("transactions")
+}
+
+model TransactionGames {
+  id             Int         @id @default(autoincrement())
+  game_id        Int?
+  transaction_id Int
+  price_paid_eur Decimal     @db.Decimal(10, 2)
+  game           Game?       @relation(fields: [game_id], references: [id], onDelete: SetNull)
+  trans          Transaction @relation(fields: [transaction_id], references: [id], onDelete: Cascade)
+
+  @@map("transaction_games")
+}
+
+model User {
+  id            Int              @id @default(autoincrement())
+  name          String?          @db.VarChar(50)
+  email         String           @unique @db.VarChar(100)
+  emailVerified DateTime?
+  password_hash String?
+  privacyAccepted Boolean        @default(true)
+  image         String?
+  cloudinary_id String?
+  created_at    DateTime?        @default(now()) @db.Timestamp(6)
+  balance_eur   Decimal?         @default(0.00) @db.Decimal(10, 2)
+  role          UserRole?        @default(user)
+  is_verified   Boolean?         @default(false)
+  phone         String?          @db.VarChar(20)
+  country       String?          @db.VarChar(100)
+  accounts      Account[]
+  cart          Cart[]
+  library       Library[]
+  reviews       Review[]
+  sessions      Session[]
+  transactions  Transaction[]
+  wishlist      Wishlist[]
+  reactions     ReviewReaction[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            Int
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       Int
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  id         Int      @id @default(autoincrement()) 
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+model Genre {
+  id          Int         @id @default(autoincrement())
+  name        String      @unique
+  game_genres GameGenre[]
+
+  @@map("genres")
+}
+
+model GameGenre {
+  game_id  Int
+  genre_id Int
+  game     Game  @relation(fields: [game_id], references: [id], onDelete: Cascade)
+  genre    Genre @relation(fields: [genre_id], references: [id], onDelete: Cascade)
+
+  @@id([game_id, genre_id])
+  @@map("game_genres")
+}
+
+model Language {
+  id             Int            @id @default(autoincrement())
+  lan_name       String         @unique
+  game_languages GameLanguage[]
+
+  @@map("languages")
+}
+
+model GameLanguage {
+  game_id       Int
+  language_id   Int
+  has_interface Boolean?     @default(true)
+  has_audio     Boolean?     @default(false)
+  has_subtitles Boolean?     @default(true)
+  game          Game         @relation(fields: [game_id], references: [id], onDelete: Cascade)
+  language      Language     @relation(fields: [language_id], references: [id], onDelete: Cascade)
+
+  @@id([game_id, language_id])
+  @@map("game_languages")
+}
+
+model GameMedia {
+  id      Int     @id @default(autoincrement())
+  game_id Int?
+  img_url String?
+  game    Game?   @relation(fields: [game_id], references: [id], onDelete: Cascade)
+
+  @@map("game_media")
+}
+
+model SystemRequirement {
+  id             Int        @id @default(autoincrement())
+  game_id        Int?
+  os_type        OSPlatform
+  is_recommended Boolean?   @default(false)
+  cpu            String?
+  gpu            String?
+  ram            String?
+  storage        String?
+  dx             String?
+  game           Game?      @relation(fields: [game_id], references: [id], onDelete: Cascade)
+  
+  @@map("system_requirements")
+}
+
+enum OSPlatform {
+  Windows
+  Linux
+  macOS
+}
+
+enum PaymentAction {
+  Deposit
+  Purchase
+}
+
+enum UserRole {
+  user
+  moderator
+  admin
+}
