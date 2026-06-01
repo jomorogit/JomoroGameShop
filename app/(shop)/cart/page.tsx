@@ -65,30 +65,28 @@ export default async function Cart(){
        <div className="lg:flex lg:justify-between lg:items-start w-full">
                 
                 <div className="lg:w-[70%] h-full">
-                    {games.map((game, index) => (
-                                    <CartCardCreator 
-                                        key={game.id}
-                                        id={game.id}
-                                        order={index + 1}
-                                        title={game.title}
-                                        rating_summary={Number(game.rating_summary || 0)}
-                                        gengres={game.game_genres}
-                                        release_date={
-                                            game.release_date 
-                                                ? new Date(game.release_date).toLocaleDateString('de-DE') // Формат: 24.10.2025
-                                                : "TBA" // Если дата выхода еще не объявлена
-                                        }
-                                        added_at={
-                                            game.wishlist[0]?.added_at 
-                                                ? new Date(game.wishlist[0].added_at).toLocaleDateString('de-DE', dateOptions) 
-                                                : "Recently"
-                                        }
-                                        price={Number(game.price_eur || 0)} 
-                                        // Картинка с запасным вариантом
-                                        image={game.card_img || game.main_img || '/img/placeholder.webp'} 
-                                      
-                                    />
-                                ))}
+                    {games.map((game: typeof games[number], index: number) => (
+                            <CartCardCreator 
+                                key={game.id}
+                                id={game.id}
+                                order={index + 1}
+                                title={game.title}
+                                rating_summary={Number(game.rating_summary || 0)}
+                                gengres={game.game_genres}
+                                release_date={
+                                    game.release_date 
+                                        ? new Date(game.release_date).toLocaleDateString('de-DE') // Формат: 24.10.2025
+                                        : "TBA" 
+                                }
+                                added_at={
+                                    game.wishlist[0]?.added_at 
+                                        ? new Date(game.wishlist[0].added_at).toLocaleDateString('de-DE', dateOptions) 
+                                        : "Recently"
+                                }
+                                price={Number(game.price_eur || 0)} 
+                                image={game.card_img || game.main_img || '/img/placeholder.webp'} 
+                            />
+                        ))}
                 </div>
                 
 
@@ -98,7 +96,7 @@ export default async function Cart(){
                         <h1 className='text-3xl'>Order Summary</h1>
                     </div>
                     
-                                {games.map((game) => (
+                               {games.map((game: typeof games[number]) => (
                                     <div key={game.id} className="flex justify-between mb-8">
                                         <span className=''>{game.title}</span>
                                         <span className="whitespace-nowrap ml-5">
