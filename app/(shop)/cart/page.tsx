@@ -16,7 +16,7 @@ export default async function Cart(){
         }
     
         const userId = Number(session.user.id);
-        let games = []; 
+       let games: typeof prisma.game.findMany.prototype = [];
     
         try {
             games = await prisma.game.findMany({
