@@ -75,7 +75,7 @@ export default async function GameLayout({
 
   return (
     <Provider>
-      <ScrollToTop/>
+      <ScrollToTop key={idFromUrl} />
       <div className="min-h-screen w-full mt-24 px-4 md:px-10 text-white pb-20">
         
         {/* Заголовок всегда сверху на всю ширину */}
