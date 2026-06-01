@@ -109,7 +109,9 @@ export default function CartCardCreator({ id, title, price, image, gengres, rati
                               <div className='flex justify-center items-center mr-4'>
                                   <p className='ml-2'>{formattedPrice}</p>
                               </div>
-                              <button className='bg-green-800 p-3 w-30 cursor-pointer hover:bg-green-700 rounded-xl'>Buy</button>
+                              {/* <button className='bg-green-800 p-3 w-30 cursor-pointer hover:bg-green-700 rounded-xl'>Buy</button> */}
+                              <Link href={`/cart/paytype?id=${id}`} className='bg-green-800 p-2 w-32 cursor-pointer rounded-xl items-center hover:bg-green-700 flex justify-center'
+                                    >Buy</Link>
                       </div>
 
                   </div>
