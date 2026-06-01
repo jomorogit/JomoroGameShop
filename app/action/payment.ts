@@ -9,6 +9,10 @@ import { sendPurchaseReceiptEmail } from "@/lib/mail";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
+
+// Если в системе есть NEXT_PUBLIC_APP_URL (на Vercel), берем его, иначе — localhost.
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+
 export async function createCheckoutSession() {
   try {
      const session = await getServerSession(authConfig);
@@ -38,7 +42,7 @@ export async function createCheckoutSession() {
         return acc + price;
      }, 0);
 
-    // перевод в центы
+     // перевод в центы
      const amountInCents = Math.round(totalEuro * 100);
 
      // Создаем сессию в Stripe
@@ -58,16 +62,14 @@ export async function createCheckoutSession() {
            quantity: 1,
          },
        ],
-       // Добавляем метаданные, чтобы потом знать, чью корзину очищать после оплаты
        metadata: {
          userId: session.user.id,
          type: 'purchase',
        },
-       success_url: 'http://localhost:3000/success?session_id={CHECKOUT_SESSION_ID}',
-       cancel_url: 'http://localhost:3000/cart',
+       success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
+       cancel_url: `${baseUrl}/cart`,
      });
 
- 
      return { url: stripeSession.url };
 
   } catch (error) {
@@ -77,7 +79,7 @@ export async function createCheckoutSession() {
 }
 
 export async function RefilMoney(finalAmount: number) {
-  try{
+  try {
     const session = await getServerSession(authConfig);
      if (!session?.user?.email || !session?.user?.id) {
         return { error: "User not authorized" };
@@ -87,7 +89,7 @@ export async function RefilMoney(finalAmount: number) {
      }
       const amountInCents = Math.round(finalAmount * 100);
 
-      // Создаем сессию в Stripe
+     // Создаем сессию в Stripe
      const stripeSession = await stripe.checkout.sessions.create({
        payment_method_types: ['card'],
        mode: 'payment',
@@ -108,13 +110,13 @@ export async function RefilMoney(finalAmount: number) {
          userId: session.user.id,
          type: 'refill',
        },
-       success_url: 'http://localhost:3000/success?session_id={CHECKOUT_SESSION_ID}',
-       cancel_url: 'http://localhost:3000/account/addmoney',
+       success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
+       cancel_url: `${baseUrl}/account/addmoney`,
      });
      return { url: stripeSession.url };
 
-  }catch(error){
-    return {error: "error"}
+  } catch(error) {
+    return { error: "error" }
   }
 }
 
@@ -125,7 +127,6 @@ export async function createCheckoutSessionGame(game_id: number) {
        return { error: "User not authorized" };
     }
 
-
     const isGame = await prisma.game.findUnique({
      where: { id: game_id }
     });
@@ -135,8 +136,6 @@ export async function createCheckoutSessionGame(game_id: number) {
     }
 
     const amountInCents = Math.round(Number(isGame.price_eur) * 100);
-    
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
     const stripeSession = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -160,7 +159,7 @@ export async function createCheckoutSessionGame(game_id: number) {
         type: 'single_purchase',
       },
       success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: 'http://localhost:3000/cart',
+      cancel_url: `${baseUrl}/cart`,
     });
 
     return { url: stripeSession.url };
@@ -221,7 +220,6 @@ export async function PayGameWithBalance(gameId: number) {
         },
       });
 
-      
       await tx.library.upsert({
         where: {
           game_id_user_id: {
@@ -239,7 +237,6 @@ export async function PayGameWithBalance(gameId: number) {
         },
       });
 
-      
       await tx.cart.delete({
         where: {
           user_id_game_id: {
@@ -249,7 +246,6 @@ export async function PayGameWithBalance(gameId: number) {
         },
       });
       
-     
       await tx.user.update({
         where: {
           id: Number(session.user.id),
@@ -262,8 +258,6 @@ export async function PayGameWithBalance(gameId: number) {
       return newTransaction; 
     });
 
-
-    
     if (session?.user?.email) {
       try {
         await sendPurchaseReceiptEmail(session.user.email, `bal_${transaction.id}`, [
@@ -274,12 +268,11 @@ export async function PayGameWithBalance(gameId: number) {
       }
     }
     const paymentType = "AccountBalance";
-    return {success: "The purchase was successful", paymentType }
+    return { success: "The purchase was successful", paymentType }
   }
-    if(userBalance < gamePrice){
+    if (userBalance < gamePrice) {
       const paySum = gamePrice - userBalance;
       const amountInCents = Math.round(paySum * 100);
-      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
       
       const stripeSession = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -303,7 +296,7 @@ export async function PayGameWithBalance(gameId: number) {
         type: 'partial_balance_purchase',
       },
       success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: 'http://localhost:3000/cart',
+      cancel_url: `${baseUrl}/cart`,
     });
 
     return { url: stripeSession.url };
