@@ -168,7 +168,7 @@ export default async function GameLayout({
                 <div>
                   <p className="text-xs uppercase font-bold text-gray-400 mb-3 tracking-widest lg:text-xl">Genres</p>
                   <div className="flex flex-wrap gap-2">
-                    {game.game_genres.map(gg => (
+                    {game.game_genres.map((gg: typeof game.game_genres[number]) => (
                       <span key={gg.genre.name} className="bg-white/5 px-3 py-1 rounded text-xs">
                         {gg.genre.name}
                       </span>
