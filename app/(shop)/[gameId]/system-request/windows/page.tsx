@@ -3,6 +3,7 @@ import React from 'react'
 import { prisma } from '@/lib/prisma'; 
 import { notFound } from 'next/navigation';
 import ScrollToMiddle from '@/app/hooks/ScrollMiddle';
+
 export default async function Windows({ params }: { params: Promise<{ gameId: string }> }) {
   const { gameId } = await params;
   const idFromUrl = parseInt(gameId.split('-')[0]);
@@ -29,18 +30,20 @@ export default async function Windows({ params }: { params: Promise<{ gameId: st
 
   if (!game) return notFound();
 
+  // Вытаскиваем строгий тип одиночной записи из схемы Prisma 💎
+  type ReqType = typeof game.system_requirements[number];
+
   // 1. Проверяем, поддерживает ли игра Windows
-  // Игра поддерживается, если есть хотя бы одна запись и у неё указан CPU
   const isWindowsSupported = game.system_requirements.length > 0 && 
-                             game.system_requirements.some(req => req.cpu !== null);
+                             game.system_requirements.some((req: ReqType) => req.cpu !== null);
 
-  // Разделяем требования на две группы
-  const minReqs = game.system_requirements.filter(req => !req.is_recommended);
-  const recReqs = game.system_requirements.filter(req => req.is_recommended);
+  // Разделяем требования на две группы 📂
+  const minReqs = game.system_requirements.filter((req: ReqType) => !req.is_recommended);
+  const recReqs = game.system_requirements.filter((req: ReqType) => req.is_recommended);
 
-  // Вспомогательная функция для отрисовки
-  const renderReqs = (reqs: typeof minReqs) => (
-    reqs.map((req) => (
+  // Вспомогательная функция для отрисовки — теперь строго типизирована! 🛠️
+  const renderReqs = (reqs: ReqType[]) => (
+    reqs.map((req: ReqType) => (
       <div key={req.id} className="text-sm space-y-1 mt-2 text-gray-300">
         <p><span className="text-gray-500">CPU:</span> {req.cpu}</p>
         <p><span className="text-gray-500">GPU:</span> {req.gpu}</p>
