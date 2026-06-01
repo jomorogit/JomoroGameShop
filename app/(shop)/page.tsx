@@ -91,7 +91,7 @@ export default async function Home() {
         {/* Контейнер для карточек */}
         <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 md:gap-8">
 
-          {games.map((game) => {
+          {games.map((game: typeof games[number]) => {
             const isInCart = cartGameIds.includes(game.id);
             const isWished = wishlistGameIds.includes(game.id);
             const isOnLibrary = LibraryGameIds.includes(game.id);
