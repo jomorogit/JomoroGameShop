@@ -23,8 +23,8 @@ export const authConfig: AuthOptions = {
 
     providers: [
         GoogleProvider({
-            clientId: `${process.env.AUTH_GOOGLE_ID}`.trim(),
-            clientSecret: `${process.env.AUTH_GOOGLE_SECRET}`.trim(),
+            clientId: `${process.env.GOOGLE_CLIENT_ID}`.trim(),
+            clientSecret: `${process.env.GOOGLE_SECRET}`.trim(),
             client: {
                 token_endpoint_auth_method: "client_secret_post",
             },

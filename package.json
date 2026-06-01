@@ -55,5 +55,8 @@
     "nodemailer": "$nodemailer",
     "prisma": "$prisma",
     "@prisma/client": "$@prisma/client"
+  },
+  "prisma": {
+    "seed": "npx tsx prisma/seed.ts"
   }
 }
