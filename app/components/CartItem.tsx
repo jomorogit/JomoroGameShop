@@ -104,7 +104,7 @@ export default function CartCardCreator({ id, title, price, image, gengres, rati
                       </div>
 
                       {/* 2. А блок с ценой и Buy будет СПРАВА */}
-                      <div className='flex p-1 w-[50%] max-w-[220px] bg-[#3D234D] md:hidden rounded-xl justify-between'>
+                      <div className='flex p-1 w-full max-w-[220px] bg-[#3D234D] md:hidden rounded-xl justify-between'>
                               {/* Покупка */}
                               <div className='flex justify-center items-center mr-4'>
                                   <p className='ml-2'>{formattedPrice}</p>

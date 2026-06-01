@@ -159,8 +159,15 @@ export default async function GameLayout({
                   
                   <div className="flex justify-between items-center">
                     <span className="text-white/40 text-lg">Release Date</span>
-                    <span className="text-lg text-right">
-                      {game.release_date ? new Date(game.release_date).toLocaleDateString() : 'TBA'}
+                    <span className="text-sm lg:text-lg text-right">
+                      {game.release_date ? 
+                            new Date(game.release_date).toLocaleDateString('en-US', {
+                              day: 'numeric',
+                              month: 'short',
+                              year: 'numeric'
+                            }) 
+                            : 'TBA'
+                          }
                     </span>
                   </div>
                 </div>
