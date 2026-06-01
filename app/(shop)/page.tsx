@@ -10,17 +10,17 @@ import { authConfig } from "../configs/auth";
 export default async function Home() {
   const session = await getServerSession(authConfig);
 
- const games = await prisma.game.findMany({
-  where: { id: { not: 1 } },
-  // Передаем массив для последовательной сортировки
-  orderBy: [
-    { rating_summary: 'desc' }, 
-    { id: 'desc' }    
-  ],
-  include: {
-    game_genres: { include: { genre: true } }
-  }
-});
+  const games = await prisma.game.findMany({
+    where: { id: { not: 1 } },
+    // Передаем массив для последовательной сортировки
+    orderBy: [
+      { rating_summary: 'desc' }, 
+      { id: 'desc' }    
+    ],
+    include: {
+      game_genres: { include: { genre: true } }
+    }
+  });
 
 
   let cartGameIds: number[] = [];
@@ -38,23 +38,24 @@ export default async function Home() {
         where: { user_id: userFromDb.id },
         select: { game_id: true }
       });
-      cartGameIds = cartItems.map(item => item.game_id);
+      // Строго типизируем перебор через typeof массива 💎
+      cartGameIds = cartItems.map((item: typeof cartItems[number]) => item.game_id);
 
       const wishlistItems = await prisma.wishlist.findMany({ 
         where: { user_id: userFromDb.id },
         select: { game_id: true }
       });
-      wishlistGameIds = wishlistItems.map(item => item.game_id);
+      wishlistGameIds = wishlistItems.map((item: typeof wishlistItems[number]) => item.game_id);
 
       const libraryItems = await prisma.library.findMany({
-                where: {user_id: userFromDb.id},
-                select: {game_id: true}
-            });
-      LibraryGameIds = libraryItems.map(item => item.game_id);
+        where: { user_id: userFromDb.id },
+        select: { game_id: true }
+      });
+      LibraryGameIds = libraryItems.map((item: typeof libraryItems[number]) => item.game_id);
     }
   }
 
- return (
+  return (
     <div className="w-full mt-24 flex flex-col items-center holographic-container pb-10"> 
       <div 
         className="relative h-[300px] md:h-[400px] holographic-card w-[92%] rounded-3xl overflow-hidden z-0"
@@ -88,7 +89,6 @@ export default async function Home() {
         <h2 className="text-xl md:text-3xl text-white mb-6 md:mb-8 font-semibold">Featured and Recommended</h2>
         
         {/* Контейнер для карточек */}
-        {/* Используем нативный CSS Grid: 2 колонки на мобилке, 3 на планшетах (md), 4+ на ПК (xl, 2xl) */}
         <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 md:gap-8">
 
           {games.map((game) => {
