@@ -16,7 +16,7 @@ export async function LoginValidation(formData: ISLoginData) {
 
         if (!existUser || !existUser.password_hash) {
             console.log("❌ Email not found or user signed up via Google");
-            return { error: "Неверный логин или пароль" };
+            return { error: "Incorrect login or password" };
         }
 
         const isPasswordCorrect = await bcrypt.compare(
@@ -26,7 +26,7 @@ export async function LoginValidation(formData: ISLoginData) {
 
         if (!isPasswordCorrect) {
             console.log("❌ Incorrect password");
-            return { error: "Неверный логин или пароль" };
+            return { error: "Incorrect login or password" };
         }
 
         await prisma.verificationToken.deleteMany({
