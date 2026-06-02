@@ -8,7 +8,7 @@ interface PurchaseItem {
 
 const emailSender = '"GameShop Support" <jomorohope@gmail.com>';
 const imagePath = path.join(process.cwd(), "lib", "Logo.webp"); 
-const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_SERVER_HOST,
