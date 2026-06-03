@@ -182,7 +182,7 @@ return (
           <p className="text-white/30 text-[13px] leading-normal font-light tracking-wide">
             By continuing, you agree to GameShop&apos;s{" "}
             <Link 
-              href="/privacy" 
+              href="/information/privacy" 
               target="_blank" 
               className="text-purple-400/80 hover:text-purple-300 underline underline-offset-2 transition-colors font-medium"
             >

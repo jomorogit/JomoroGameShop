@@ -138,8 +138,8 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
        }
     }
   return (
-     <div className="flex flex-col items-center justify-center min-h-full w-auto rounded-2xl bg-[#0a0514]">
-        <div className="flex flex-col items-center w-96 max-w-md bg-[#1a1625]/90 backdrop-blur-md p-10 rounded-3xl border border-purple-500/20 shadow-[0_0_50px_rgba(147,67,231,0.1)]">
+     <div className="flex flex-col items-center justify-center min-h-full w-full rounded-2xl bg-[#0a0514]">
+        <div className="flex flex-col items-center w-96 max-w-md bg-[#1a1625]/90 backdrop-blur-md p-10 rounded-3xl border w-full border-purple-500/20 shadow-[0_0_50px_rgba(147,67,231,0.1)]">
          <h1 className="font-inder text-3xl text-white font-bold tracking-tight">Password recovery</h1>
 
         {step === 0 && ( 

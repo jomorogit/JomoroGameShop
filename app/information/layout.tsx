@@ -41,10 +41,9 @@ export default function RegisterLayout({
           {/* Нижняя часть: Меню профиля + контент*/}
           <main className="flex flex-col md:flex-row w-full flex-1">
             {/* Левое меню профиля */}
-            
-            <ProfilePhoneControl/>
+          
             {/* Сама страница (children) */}
-            <div className="flex items-center justify-center w-full">
+            <div className="flex items-center justify-center w-full md:mt-10">
               {children}
             </div>
           </main>

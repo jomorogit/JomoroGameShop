@@ -59,13 +59,17 @@ export default function Footer() {
         {/* Разделительная линия */}
         <div className="w-full h-[1px] bg-purple-900/20" />
 
-        {/* Нижняя часть: Копирайт */}
+       {/* Нижняя часть: Копирайт */}
         <div className="flex flex-col text-center text-xs lg:text-xl text-gray-500 gap-2 px-4">
           <p>
             © {new Date().getFullYear()} GameShop. All Rights Reserved. 
           </p>
           <p className="text-[10px] sm:text-[11px] text-gray-600 leading-relaxed">
             All registered trademarks and game images are property of their respective owners.
+          </p>
+          {/* Добавляем строчку про демо-статус */}
+          <p className="text-[10px] sm:text-[11px] text-amber-600/80 italic font-medium core-tracking">
+            This is a non-commercial educational portfolio project. No real purchases can be made.
           </p>
         </div>
 
