@@ -18,6 +18,10 @@ const inder = Inder({
 export const metadata: Metadata = {
   title: "GameShop",
   description: "Your ultimate game store",
+  icons: {
+    icon: './icons/icon.ico', 
+    apple: './icons/icon.ico',  
+  },
 };
 
 export default function RootLayout({
