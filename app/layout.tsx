@@ -17,7 +17,7 @@ const inder = Inder({
 
 export const metadata: Metadata = {
   title: "GameShop",
-  description: "Your ultimate dark fantasy game store",
+  description: "Your ultimate game store",
 };
 
 export default function RootLayout({
