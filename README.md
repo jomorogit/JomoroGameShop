@@ -8,7 +8,7 @@
 
 ## Preview & Screenshots
 
-![GameShop Home Screen](<img width="1902" height="991" alt="scren" src="https://github.com/user-attachments/assets/91357c53-6e20-4eb5-b355-66aeb466ed6f" />)
+![GameShop Home Screen](https://github.com/user-attachments/assets/91357c53-6e20-4eb5-b355-66aeb466ed6f)
 
 ### Video Walkthrough & AI Demo
 
@@ -43,3 +43,5 @@
 
 ---
 
+##  **Contact**
+Illia Kots - [LinkedIn](https://www.linkedin.com/in/illia-kots-1b5b15356/) - illa08878@gmail.com
