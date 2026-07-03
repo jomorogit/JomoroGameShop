@@ -1,6 +1,6 @@
 # GameShop
 
-> A premium Full-Stack E-commerce Platform built with a dark-fantasy aesthetic, featuring seamless Stripe payments and automated AI content generation.
+> A Full-Stack E-commerce Platform, featuring seamless Stripe payments and automated AI content generation.
 
 **LIVE DEMO:** [https://jomoro-game-shop.vercel.app/](https://jomoro-game-shop.vercel.app/)
 
@@ -18,7 +18,7 @@
 
 ## AI Features & Automation
 
-* **Automated Content Generation:** Integrated Gemini API to automatically parse game metadata, generate rich descriptions, and assign relevant category tags.
+* **Automated Content Generation:** Integrated Gemini API to automatically generate rich descriptions, and assign relevant category tags.
 * **Smart Cataloging:** Eliminates manual data entry by converting raw titles into fully filled product cards with optimized JSON structures.
 
 ## Core Functionality
