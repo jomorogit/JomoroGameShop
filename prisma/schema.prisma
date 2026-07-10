@@ -45,6 +45,7 @@ model Cart {
 
   @@id([user_id, game_id])
   @@map("cart")
+  @@index([user_id])
 }
 
 model Library {
@@ -59,6 +60,7 @@ model Library {
 
   @@id([game_id, user_id])
   @@map("library")
+  @@index([user_id])
 }
 
 model Wishlist {
@@ -70,6 +72,7 @@ model Wishlist {
 
   @@id([game_id, user_id])
   @@map("wishlist")
+  @@index([user_id])
 }
 
 enum ReactionType {
