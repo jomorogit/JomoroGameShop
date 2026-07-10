@@ -6,30 +6,27 @@
     import { authConfig } from "../configs/auth";
     import { prisma } from '@/lib/prisma'; 
     import AccountProfileName from "./AccountProfileName"
+    import { unstable_cache } from 'next/cache';
+
+    const getUserData = unstable_cache(
+        async (email: string) => {
+            const user = await prisma.user.findUnique({
+            where: { email },
+            select: { balance_eur: true, id: true }
+            });
+            
+            if (!user) return null;
+
+            const cartCount = await prisma.cart.count({ where: { user_id: user.id } });
+            return { balance: user.balance_eur, cartCount };
+        },
+        ['user-header-data'], // Ключ кэша
+        { tags: ['user-data'], revalidate: 60 } // Кэшируем на 60 секунд
+        );
+
     export default async function Account() {
     const session = await getServerSession(authConfig);
-
-    let currentBalance = "0.00"; 
-    let cartCounter = 0; 
-
-    if (session?.user?.email) {
-    const userFromDb = await prisma.user.findUnique({
-        where: { email: session.user.email },
-        select: { balance_eur: true, id: true } 
-    });
-
-    if (userFromDb) {
-        currentBalance = Number(userFromDb.balance_eur || 0).toFixed(2);
-        
-        const cartCount = await prisma.cart.count({
-            where: {
-                user_id: userFromDb.id, 
-            },
-        });
-        cartCounter = cartCount;
-    }
-}
-
+    const userData = session?.user?.email ? await getUserData(session.user.email) : null;
 
         return (
             <div className="fixed top-5 right-[4%] z-70 flex justify-end">
@@ -38,7 +35,7 @@
                     {/* Корзина */}
                     <Link href="/cart" className="relative md:p-2 group transition-transform hover:scale-110 mr-4 hidden md:block">
                         {/* Бейдж с числом*/}
-                        {cartCounter > 0 && (
+                        {(userData?.cartCount ?? 0) > 0 && (
                         <div className="absolute -top-1 -right-1 
                                         bg-red-600 text-white 
                                         text-[14px] font-bold 
@@ -47,10 +44,10 @@
                                         rounded-full 
                                         border-2 border-[#1A0B25] {/* Цвет фона вашего сайта */}
                                         shadow-lg">
-                            <span>{cartCounter}</span>
+                            <span>{userData?.cartCount}</span>
                         </div>
                         )}
-                        {/* Иконка корзины 🛒 */}
+                        {/* Иконка корзины */}
                         <Image
                             src={Cart} 
                             alt="cart" 
@@ -69,7 +66,7 @@
 
                             
                             <Link href="/account/addmoney" className="cursor-pointer font-inder text-lg text-white font-bold">
-                                {currentBalance}€
+                                {userData ? Number(userData.balance).toFixed(2) : "0.00"}€
                             </Link>
                         </div>
                         

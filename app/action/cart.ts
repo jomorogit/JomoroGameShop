@@ -2,6 +2,7 @@
 import { getServerSession } from "next-auth"
 import { authConfig } from "../configs/auth";
 import { prisma } from "@/lib/prisma"; 
+import { revalidateTag } from 'next/cache';
 import { revalidatePath } from "next/cache";
 export async function AddToCart(gameID: number) {
     const session = await getServerSession(authConfig);
@@ -36,7 +37,8 @@ export async function AddToCart(gameID: number) {
         
         }
 
-        revalidatePath("/", "layout"); // Пересоберет весь макет, чтобы данные обновились везде
+        // revalidatePath("/", "layout"); 
+        revalidateTag('user-data', {});
         
         return { success: true, isAdded: !existingEntry };
     }catch(error){
@@ -110,12 +112,13 @@ export async function RemoveGame(id: number) {
             })
              console.log("Удалено!");
         }
-        revalidatePath("/cart", "layout"); 
+        // revalidatePath("/cart", "layout");
+         revalidateTag('user-data', {}); 
         
         return { success: true, isAdded: !existingEntry };
 
     }catch(error){
-      console.error("Remove Error: ❌", error);
+      console.error("Remove Error:", error);
         return { error: "Internal server error" };
     }
 }
@@ -140,9 +143,9 @@ export async function CartState(gameID: number) {
             }
         });
         if(CartOfUser?.cart.length ?? 0){
-            return true; // Если не нашли игру в базе, возвращаем false
+            return true; 
         } else{
-            return false; // Если нашли игру в базе, возвращаем false
+            return false;
         }
 
         
