@@ -1,63 +1,8 @@
-import {GetAllPrice} from '../../action/cart';
-import CartCardCreator from '@/app/components/CartItem';
-import { prisma } from "@/lib/prisma"; 
-import { authConfig } from "../../configs/auth";
-import { getServerSession } from "next-auth";
 import CartList from '@/app/components/CartList';
-import Link from 'next/link';
 import CheckoutButton from '@/app/ui/CheckoutButton';
 import CartSummary from '@/app/components/CartSummary';
-export default async function Cart(){
-        const result = await GetAllPrice();
-        const totalPrice = result.total || 0;
-
-
-    const session = await getServerSession(authConfig);
-        if (!session?.user?.id) {
-            return <div className="p-10 text-white">Please log in to your account</div>;
-        }
-    
-        const userId = Number(session.user.id);
-       let games: typeof prisma.game.findMany.prototype = [];
-    
-        try {
-            games = await prisma.game.findMany({
-                where: { 
-                    cart: {
-                        some: {
-                            user_id: userId
-                        }
-                    }
-                },
-                orderBy: { id: 'desc' },
-                include: {
-                    game_genres: { include: { genre: true } },
-                    wishlist: {
-                where: { user_id: userId }
-            },
-                }
-                
-            });
-        } catch (error) {
-            console.error("Error receiving wishlist", error);
-            return <div className="p-10 text-white">Error loading data</div>;
-        }
-    
-        if (games.length === 0) {
-            return <div className="p-10 text-white text-center text-3xl mt-50 flex flex-col items-center">
-                Your cart is empty
-                <Link href="/store" className='block border-2 border-purple-800 rounded-2xl w-60 p-2 mt-4'>Explore Shop</Link>
-                </div>;
-
-        }
-    
-    
-    
-        const dateOptions: Intl.DateTimeFormatOptions = {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric'
-        };    
+import CartSummuryData from "@/app/components/CartSummuryData";
+export default function Cart(){
     return(
         <div className='mt-20 pl-4 pr-4 lg:pl-10 lg:pr-10 w-full mr-10'>   
             <div className='mb-6 w-full flex justify-center lg:justify-start'>
@@ -68,42 +13,25 @@ export default async function Cart(){
                 
                <CartList/>
                 
-
                 {/* Тотальная сумма */}
                 <div className="bg-[#23122E] w-full lg:w-[28%] h-auto rounded-2xl p-4">
                     <div className='w-full flex justify-center mb-8'>
                         <h1 className='text-3xl'>Order Summary</h1>
                     </div>
-
-
                                {/* price and name */}
-                                
-                               {games.map((game: typeof games[number]) => (
-                                    <div key={game.id} className="flex justify-between mb-8">
-                                        <span className=''>{game.title}</span>
-                                        <span className="whitespace-nowrap ml-5">
-                                            {Number(game.price_eur || 0)} €
-                                        </span>
-                                    </div>
-                                ))}
-
+                                <CartSummuryData/>
                     
                     <div className='diviser w-full bg-[#3B2A46] h-2 rounded-2xl mb-8'></div>
 
                     <div className=' flex justify-between'>
                         <span>Total:</span>
-                        
-                        {/*  */}
                         <CartSummary/>
-                        
                     </div>
                   
                     <div className='flex justify-center mt-10'>
                         {/* Создаем компонент клиентский */}
                         <CheckoutButton/>
                     </div>
-                   
-
                 </div>
                 {/* Phone */}
                 <div className='lg:hidden w-full h-20'></div>
