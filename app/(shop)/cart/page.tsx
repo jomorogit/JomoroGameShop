@@ -5,57 +5,47 @@ import { authConfig } from "../../configs/auth";
 import { getServerSession } from "next-auth";
 import Link from 'next/link';
 import CheckoutButton from '@/app/ui/CheckoutButton';
-export default async function Cart(){
-        const result = await GetAllPrice();
-        const totalPrice = result.total || 0;
-
-
+export default async function Cart() {
     const session = await getServerSession(authConfig);
-        if (!session?.user?.id) {
-            return <div className="p-10 text-white">Please log in to your account</div>;
-        }
+    if (!session?.user?.id) {
+        return <div className="p-10 text-white">Please log in to your account</div>;
+    }
     
-        const userId = Number(session.user.id);
-       let games: typeof prisma.game.findMany.prototype = [];
-    
-        try {
-            games = await prisma.game.findMany({
-                where: { 
-                    cart: {
-                        some: {
-                            user_id: userId
-                        }
-                    }
-                },
-                orderBy: { id: 'desc' },
-                include: {
-                    game_genres: { include: { genre: true } },
-                    wishlist: {
-                where: { user_id: userId }
-            },
-                }
-                
-            });
-        } catch (error) {
-            console.error("Error receiving wishlist", error);
-            return <div className="p-10 text-white">Error loading data</div>;
-        }
-    
-        if (games.length === 0) {
-            return <div className="p-10 text-white text-center text-3xl mt-50 flex flex-col items-center">
+    const userId = Number(session.user.id);
+
+    // 1. Выполняем расчет цены и получение данных ОДНОВРЕМЕННО
+    const [result, games] = await Promise.all([
+        GetAllPrice(),
+        prisma.game.findMany({
+            where: { cart: { some: { user_id: userId } } },
+            orderBy: { id: 'desc' },
+            // 2. Оптимизируем выборку: берем только нужные поля, убираем тяжелый include, если он не критичен
+            select: {
+                id: true,
+                title: true,
+                price_eur: true,
+                card_img: true,
+                main_img: true,
+                rating_summary: true,
+                release_date: true,
+                game_genres: { include: { genre: true } },
+                // Если wishlist нужен только для даты добавления, пробуем вынести это в отдельный быстрый запрос, 
+                // если этот include тормозит систему
+                wishlist: { where: { user_id: userId } }
+            }
+        })
+    ]);
+
+    const totalPrice = result.total || 0;
+
+    if (games.length === 0) {
+        return (
+            <div className="p-10 text-white text-center text-3xl mt-50 flex flex-col items-center">
                 Your cart is empty
                 <Link href="/store" className='block border-2 border-purple-800 rounded-2xl w-60 p-2 mt-4'>Explore Shop</Link>
-                </div>;
-
-        }
-    
-    
-    
-        const dateOptions: Intl.DateTimeFormatOptions = {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric'
-        };    
+            </div>
+        );
+    }
     return(
         <div className='mt-20 pl-4 pr-4 lg:pl-10 lg:pr-10 w-full mr-10'>   
             <div className='mb-6 w-full flex justify-center lg:justify-start'>
@@ -80,7 +70,7 @@ export default async function Cart(){
                                 }
                                 added_at={
                                     game.wishlist[0]?.added_at 
-                                        ? new Date(game.wishlist[0].added_at).toLocaleDateString('de-DE', dateOptions) 
+                                        ? new Date(game.wishlist[0].added_at).toLocaleDateString('de-DE') 
                                         : "Recently"
                                 }
                                 price={Number(game.price_eur || 0)} 

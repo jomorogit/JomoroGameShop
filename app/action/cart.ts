@@ -79,7 +79,7 @@ export async function GetAllPrice() {
         return { success: true, total: totalSum }; 
 
     } catch (error) {
-        console.error("Total Price Error: ❌", error);
+        console.error("Total Price Error:", error);
         return { error: "Internal server error", total: 0 };
     }
 }
