@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -9,16 +9,20 @@ import { Star } from "lucide-react";
 import AddToCartButtonMainPage from '../ui/AddToCartButtonMainPage';
 import AddToWishListMainPage from '../ui/AddToWishListButtonMainPage';
 
+
+import useSWR from 'swr'; //
+
 export interface GameCardProps {
   id: number; 
   title: string;
   price: number;
   image: string;
   rating_summary?: number;
-  initialIsInCart: boolean; 
-  initialIsWished: boolean; 
-  initialIsLibrary: boolean;
 }
+
+
+//fetcher for swr
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function MainPageGameCreator({ 
   id, 
@@ -26,9 +30,6 @@ export default function MainPageGameCreator({
   price, 
   image, 
   rating_summary, 
-  initialIsInCart, 
-  initialIsWished,
-  initialIsLibrary,
 }: GameCardProps) {
  
    const router = useRouter(); 
@@ -36,7 +37,13 @@ export default function MainPageGameCreator({
    const finalHref = generateGameHref(id, title);
    const rating = (Number(rating_summary || 0) / 2).toFixed(1);
    
-   const [isOnLibrary, setIsOnLibrary] = useState(initialIsLibrary);
+   
+   const {data, error, isLoading} = useSWR('/api/user-status', fetcher);
+
+   // states (array id's from api)
+   const isOnLibrary = data?.library?.includes(id) ?? false;
+   const isOnCart = data?.cart?.includes(id) ?? false;
+   const isWished = data?.cart?.includes(id) ?? false;
 
    return (
         <Link 
@@ -71,8 +78,7 @@ export default function MainPageGameCreator({
                     <p className="font-medium text-sm md:text-xl">{formattedPrice}</p> 
                 </div>
                 
-                {/* Секция кнопок */}
-                {/* Добавили gap-2 и уменьшили паддинги на мобилках, чтобы кнопки не вылезали за рамки */}
+            
                 <div className='mt-3 flex justify-between items-center gap-2'>
                     {isOnLibrary ? (
                         <button 
@@ -88,15 +94,27 @@ export default function MainPageGameCreator({
                         </button>
                     ) : (
                         <>
-                            {/* Оберткам кнопок добавляем flex-управление для правильного сжатия на смартфонах */}
+                           
 
                             <div className='flex items-center justify-around w-full'>
                                 <div className='flex-1 min-w-0' onClick={(e) => e.stopPropagation()}>
-                                    <AddToCartButtonMainPage gameID={id} price={price} initialIsOnCart={initialIsInCart}/>
+                                    {isLoading ? (
+                                         <div>
+                                            Loading
+                                        </div>
+                                    ) : (
+                                        <AddToCartButtonMainPage gameID={id} price={price} initialIsOnCart={isOnCart}/> 
+                                    )} 
+                                   
                                 </div>
                                 
                                 <div className='flex-shrink-0 ml-1' onClick={(e) => e.stopPropagation()}>
-                                    <AddToWishListMainPage gameID={id} title={title} initialIsWished={initialIsWished}/>
+                                    {isLoading ? (
+                                      <Star className=" text-yellow-400 w-8 h-8" />  
+                                    ) : (
+                                         <AddToWishListMainPage gameID={id} title={title} initialIsWished={isWished}/>
+                                    )}
+                                   
                                 </div>
                             </div>
                           

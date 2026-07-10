@@ -1,50 +1,15 @@
 // app/page.tsx
 import Image from "next/image";
 import SilkSong from "./img/Game1.webp"; 
-import CreateCard from "../components/HomeItem";
-import { prisma } from '@/lib/prisma'; 
+import HomeItem from "../components/HomeItem"; 
 import Link from "next/link";
-import { getServerSession } from "next-auth";
-import { authConfig } from "../configs/auth";
 import { getCachedGames } from "../utils/db-queries";
 
 
 export default async function Home() {
-  const session = await getServerSession(authConfig);
 
   const games = await getCachedGames();
 
-  let cartGameIds: number[] = [];
-  let wishlistGameIds: number[] = [];
-  let LibraryGameIds: number[] = [];
-
-  if (session?.user?.email) {
-    const userFromDb = await prisma.user.findUnique({
-      where: { email: session.user.email },
-      select: { id: true }
-    });
-
-    if (userFromDb) {
-      const cartItems = await prisma.cart.findMany({
-        where: { user_id: userFromDb.id },
-        select: { game_id: true }
-      });
-      // Строго типизируем перебор через typeof массива
-      cartGameIds = cartItems.map((item: typeof cartItems[number]) => item.game_id);
-
-      const wishlistItems = await prisma.wishlist.findMany({ 
-        where: { user_id: userFromDb.id },
-        select: { game_id: true }
-      });
-      wishlistGameIds = wishlistItems.map((item: typeof wishlistItems[number]) => item.game_id);
-
-      const libraryItems = await prisma.library.findMany({
-        where: { user_id: userFromDb.id },
-        select: { game_id: true }
-      });
-      LibraryGameIds = libraryItems.map((item: typeof libraryItems[number]) => item.game_id);
-    }
-  }
 
   return (
     <div className="w-full mt-24 flex flex-col items-center holographic-container pb-10"> 
@@ -84,21 +49,15 @@ export default async function Home() {
         <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 md:gap-8">
 
           {games.map((game: typeof games[number]) => {
-            const isInCart = cartGameIds.includes(game.id);
-            const isWished = wishlistGameIds.includes(game.id);
-            const isOnLibrary = LibraryGameIds.includes(game.id);
-
+        
             return (
-              <CreateCard 
+              <HomeItem 
                 key={game.id}
                 id={game.id}
                 title={game.title}
                 price={Number(game.price_eur)} 
                 image={game?.card_img || game?.main_img || 'https://res.cloudinary.com/dla93ueam/image/upload/v1778947999/Gemini_Generated_Image_w233n0w233n0w233_qgcacd.png'}
                 rating_summary={Number(game.rating_summary || 0)}
-                initialIsInCart={isInCart}
-                initialIsWished={isWished}
-                initialIsLibrary={isOnLibrary}
               />
             );
           })}
