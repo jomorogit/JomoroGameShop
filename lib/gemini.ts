@@ -18,8 +18,8 @@ const cleanJson = (text: string) => {
 
 export async function generateFullGameData(gameTitle: string) {
   const gengres = await GetGangres();
-    if (!genAI) return { success: false, error: "Нет API ключа 🔑" };
-    if (!gameTitle) return { success: false, error: "Введите название игры! ⛔" };
+    if (!genAI) return { success: false, error: "Нет API ключа" };
+    if (!gameTitle) return { success: false, error: "Введите название игры" };
 
     const model = genAI.getGenerativeModel({ 
         model: "gemini-3.1-flash-lite-preview",
@@ -89,9 +89,9 @@ NO extra text, explanations, or punctuation.
 
 
 9. "rating_summary":
-    - Content: Provide a maturity intensity rating for the game on a scale from 1 to 10. 📈
+    - Content: Provide a maturity intensity rating for the game on a scale from 1 to 10.
     - Format: Output ONLY the number.
-    - If the rating is unavailable, the game is unrated, or you are not 100% certain: Output nothing (leave the field empty). 🚫
+    - If the rating is unavailable, the game is unrated, or you are not 100% certain: Output nothing (leave the field empty).
     - NO labels, extra text, or punctuation.
 
 10. "price_eur":
@@ -173,7 +173,7 @@ GENERAL RULES:
         } 
     };
 } catch (error) {
-    console.error("❌ Gemini Error:", error);
-    return { success: false, error: "Ошибка при обработке данных нейросетью 🤖" };
+    console.error("Gemini Error:", error);
+    return { success: false, error: "Ошибка при обработке данных нейросетью" };
 }
 }

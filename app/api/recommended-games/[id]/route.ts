@@ -100,7 +100,7 @@ export async function GET(
           id: game.id,
           title: game.title,
           main_img: game.main_img || '/placeholder-image.jpg', 
-          price: Number(game.price_eur), // ✅ Евро 💶
+          price: Number(game.price_eur), 
           card_img: game.card_img || '/placeholder-image.jpg', 
           link: generateGameHref(game.id, game.title),
           matches: 0
