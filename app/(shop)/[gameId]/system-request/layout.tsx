@@ -20,17 +20,12 @@ export default async function GameLayout({
 
  const { gameId } = await params;
     
-      // 1. Извлекаем ID из начала строки
-      // gameId выглядит как "1-hollow-knight-silksong"
       const idFromUrl = parseInt(gameId.split('-')[0]);
-    
-      // Проверка на случай, если в URL вообще нет числа
+
       if (isNaN(idFromUrl)) {
         return notFound();
       }
     
-      // 2. Ищем игру в базе строго по ID
-      // findUnique работает быстрее всего, так как ID — это первичный ключ
       const game = await prisma.game.findUnique({
         where: {
           id: idFromUrl
@@ -41,13 +36,10 @@ export default async function GameLayout({
         }
       });
     
-      // 3. Если игра не найдена в базе — показываем 404 
+  
       if (!game) {
         return notFound();
       }
-    
-
-    
 
   return (
 

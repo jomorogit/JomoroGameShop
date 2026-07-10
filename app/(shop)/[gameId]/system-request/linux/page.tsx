@@ -30,10 +30,7 @@ export default async function Linux({ params }: { params: Promise<{ gameId: stri
 
   if (!game) return notFound();
 
-  // Создаем чистый тип одиночного требования прямо из схемы запроса Prisma 💎
   type ReqType = typeof game.system_requirements[number];
-
-  // 1. Проверяем, поддерживает ли игра Linux
   const isLinuxSupported = game.system_requirements.length > 0 && 
                            game.system_requirements.some((req: ReqType) => req.cpu !== null);
 
@@ -41,7 +38,7 @@ export default async function Linux({ params }: { params: Promise<{ gameId: stri
   const minReqs = game.system_requirements.filter((req: ReqType) => !req.is_recommended);
   const recReqs = game.system_requirements.filter((req: ReqType) => req.is_recommended);
 
-  // Вспомогательная функция для отрисовки — теперь строго типизирована! 🛠️
+
   const renderReqs = (reqs: ReqType[]) => (
     reqs.map((req: ReqType) => (
       <div key={req.id} className="text-sm space-y-1 mt-2 text-gray-300">

@@ -30,18 +30,15 @@ export default async function MacOS({ params }: { params: Promise<{ gameId: stri
 
   if (!game) return notFound();
 
-  // Вытаскиваем строгий тип одиночной записи из схемы Prisma 💎
+ 
   type ReqType = typeof game.system_requirements[number];
 
-  // 1. Проверяем, поддерживает ли игра macOS 
   const isMacSupported = game.system_requirements.length > 0 && 
                          game.system_requirements.some((req: ReqType) => req.cpu !== null);
 
-  // Разделяем требования на две группы 📂
   const minReqs = game.system_requirements.filter((req: ReqType) => !req.is_recommended);
   const recReqs = game.system_requirements.filter((req: ReqType) => req.is_recommended);
 
-  // Вспомогательная функция для отрисовки — теперь строго типизирована! 🛠️
   const renderReqs = (reqs: ReqType[]) => (
     reqs.map((req: ReqType) => (
       <div key={req.id} className="text-sm space-y-1 mt-2 text-gray-300">
@@ -65,7 +62,7 @@ export default async function MacOS({ params }: { params: Promise<{ gameId: stri
       {!isMacSupported ? (
         <div className="w-full text-center py-6 bg-red-950/30 border border-red-900/50 rounded-xl">
           <p className="text-red-400 text-lg font-medium">
-            ❌ This game is not supported on macOS
+            This game is not supported on macOS
           </p>
         </div>
       ) : (

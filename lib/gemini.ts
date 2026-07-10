@@ -18,8 +18,8 @@ const cleanJson = (text: string) => {
 
 export async function generateFullGameData(gameTitle: string) {
   const gengres = await GetGangres();
-    if (!genAI) return { success: false, error: "Нет API ключа" };
-    if (!gameTitle) return { success: false, error: "Введите название игры" };
+    if (!genAI) return { success: false, error: "No API key" };
+    if (!gameTitle) return { success: false, error: "Enter the game name" };
 
     const model = genAI.getGenerativeModel({ 
         model: "gemini-3.1-flash-lite-preview",
@@ -174,6 +174,6 @@ GENERAL RULES:
     };
 } catch (error) {
     console.error("Gemini Error:", error);
-    return { success: false, error: "Ошибка при обработке данных нейросетью" };
+    return { success: false, error: "Error in data processing by AI" };
 }
 }

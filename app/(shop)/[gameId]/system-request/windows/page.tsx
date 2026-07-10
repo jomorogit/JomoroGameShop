@@ -30,14 +30,14 @@ export default async function Windows({ params }: { params: Promise<{ gameId: st
 
   if (!game) return notFound();
 
-  // Вытаскиваем строгий тип одиночной записи из схемы Prisma 💎
+
   type ReqType = typeof game.system_requirements[number];
 
-  // 1. Проверяем, поддерживает ли игра Windows
+
   const isWindowsSupported = game.system_requirements.length > 0 && 
                              game.system_requirements.some((req: ReqType) => req.cpu !== null);
 
-  // Разделяем требования на две группы 📂
+
   const minReqs = game.system_requirements.filter((req: ReqType) => !req.is_recommended);
   const recReqs = game.system_requirements.filter((req: ReqType) => req.is_recommended);
 
@@ -65,7 +65,7 @@ export default async function Windows({ params }: { params: Promise<{ gameId: st
       {!isWindowsSupported ? (
         <div className="w-full text-center py-6 bg-red-950/30 border border-red-900/50 rounded-xl">
           <p className="text-red-400 text-lg font-medium">
-            ❌ This game is not supported on Windows
+            This game is not supported on Windows
           </p>
         </div>
       ) : (

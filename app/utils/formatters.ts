@@ -2,7 +2,7 @@
 export const createSlug = (str: string): string => {
     return str
         .toLowerCase()
-        .replace(/\s+/g, '-')     // Пробелы -> дефисы
+        .replace(/\s+/g, '-')     // Пробелы дефисы
         .replace(/[^\w-]+/g, ''); // Удаляем спецсимволы
 };
 

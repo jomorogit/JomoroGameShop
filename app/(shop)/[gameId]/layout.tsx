@@ -3,7 +3,6 @@ import Image from 'next/image';
 import { prisma } from '@/lib/prisma';
 import { getServerSession } from "next-auth";
 import { authConfig } from "../../configs/auth";
-// Компоненты
 import { Provider } from "@/app/components/Provider";
 import Slider from "@/app/components/Slider";
 import AddToCartButton from "@/app/ui/AddToCartButton";
@@ -45,7 +44,7 @@ export default async function GameLayout({
     });
 
     if (userFromDb) {
-      // Одним запросом берем все ID из корзины
+     
       const cartItems = await prisma.cart.findMany({
         where: { user_id: userFromDb.id },
         select: { game_id: true }
@@ -78,25 +77,23 @@ export default async function GameLayout({
       <ScrollToTop key={idFromUrl} />
       <div className="min-h-screen w-full mt-24 px-4 md:px-10 text-white pb-20">
         
-        {/* Заголовок всегда сверху на всю ширину */}
+       
         <header className="mb-8">
           <h1 className="text-4xl md:text-5xl font-bold">{game.title}</h1>
         </header>
 
-        {/* ОСНОВНОЙ КОНТЕЙНЕР РАЗДЕЛЕННЫЙ НА 2 ЧАСТИ */}
-        {/* На мобилках gap-6 задает отступ между всеми перетасованными блоками */}
+      
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-10">
           
-          {/* ЛЕВАЯ ЧАСТЬ (65%) — Весь основной контент */}
-          {/* ИСПОЛЬЗУЕМ contents на мобильных */}
+         
           <main className="contents lg:flex lg:w-[65%] lg:flex-col lg:gap-8 min-w-0">
             
-            {/* 2. Слайдер 🖼️ */}
+       
             <div className="order-2 lg:order-none bg-black/20 rounded-2xl p-1 shadow-2xl overflow-hidden w-full">
               <Slider media={mediaForSlider} />
             </div>
 
-            {/* 3. Кнопки управления (Wishlist, Subscribe, Hide) */}
+         
             <div className="order-3 lg:order-none bg-[#23122E] p-4 rounded-2xl flex flex-wrap items-center gap-4">
               <AddToWishList gameID={game.id} />
               {/* На данный момент не добавлены */}
@@ -116,7 +113,7 @@ export default async function GameLayout({
               <AddToCartButton gameID={game.id} price={game.price_eur.toNumber()} initialIsOnCart={cartGameIds.includes(game.id)} initialIsOnLibrary={LibraryGameIds.includes(game.id)}/>
             </div>
 
-            {/* 5. Ссылки и описание*/}
+        
             <div className="order-5 lg:order-none space-y-6">
               <ThisGameLinks id={game.id} title={game.title} />
               <div className="mt-5">
@@ -125,8 +122,7 @@ export default async function GameLayout({
             </div>
           </main>
 
-          {/* ПРАВАЯ ЧАСТЬ (35%) — Инфо, Языки, См. также */}
-          {/* contents для мобилок! */}
+       
           <aside className="contents lg:flex lg:w-[35%] lg:flex-col lg:gap-6">
             
             {/* 1. Карточка с инфо об игре */}

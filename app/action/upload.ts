@@ -11,13 +11,13 @@ export async function uploadImage(formData: FormData) {
   //получаем сессию пользователя
   const session = await getServerSession(authConfig);
   // если нету сессии или нету пользователя , то выдаем ошибку что пользователь не авторизован
-  if (!session?.user?.email) return { error: "Unauthorized 🚫" };
+  if (!session?.user?.email) return { error: "Unauthorized" };
 
   // получаем нашу форм дату из фронтенда, с картинкой внутри
   const file = formData.get("image") as File;
   // проверяем что если картинки нету или если её размер равен нулю , то выдаем ошибку что файл не выбран или пуст
   if (!file || file.size === 0) {
-    return { success: false, error: "The file is not selected or is empty. 📁" };
+    return { success: false, error: "The file is not selected or is empty." };
   }
 
   // потом делаем проверку типа файла, он должен быть image, чтобы пользователь не мог загрузить нам например свои скрипты на бекенд
@@ -97,7 +97,7 @@ export async function uploadImage(formData: FormData) {
   // ловим ошибки
   } catch (error) {
     console.error("Global upload error:", error);
-    return { success: false, error: "Processing error ⚠️" };
+    return { success: false, error: "Processing error" };
   }
 }
 
@@ -106,7 +106,7 @@ export async function uploadImage(formData: FormData) {
 export async function deleteImage(){
     const session = await getServerSession(authConfig);
 
-  if (!session?.user?.email) return { error: "Unauthorized 🚫" };
+  if (!session?.user?.email) return { error: "Unauthorized" };
 
   try {
     // 1. Сначала находим пользователя, чтобы узнать его старый cloudinary_id
@@ -143,6 +143,6 @@ export async function deleteImage(){
 
   } catch (error) {
     console.error("Global upload error:", error);
-    return { success: false, error: "Processing error ⚠️" };
+    return { success: false, error: "Processing error" };
   }
 }

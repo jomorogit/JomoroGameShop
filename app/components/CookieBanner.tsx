@@ -22,7 +22,7 @@ export default function CookieBanner() {
     return () => window.clearTimeout(timer);
   }, []);
 
-  // Если баннер не нужно показывать, возвращаем null (в том числе при SSR)
+  // Если баннер не нужно показывать, возвращаем null
   if (!showBanner) return null;
 
   // Функция сохранения при нажатии "Accept All"
@@ -30,8 +30,7 @@ export default function CookieBanner() {
     localStorage.setItem("cookie_consent", "granted");
     setShowBanner(false);
     
-    // TODO: Здесь лучше вызвать функцию инициализации вашей аналитики,
-    // например: initializeGoogleAnalytics();
+    
   };
 
   // Функция сохранения при нажатии "Decline"
@@ -47,8 +46,7 @@ export default function CookieBanner() {
     setShowBanner(false);
     
     if (analyticsAllowed) {
-      // TODO: Инициализировать аналитику здесь, если она разрешена
-      // например: initializeGoogleAnalytics();
+    
     }
   };
 

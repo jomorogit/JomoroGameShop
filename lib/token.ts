@@ -1,4 +1,3 @@
-// lib/tokens.ts
 import { prisma } from "@/lib/prisma";
 
 export const generateVerificationToken = async (email: string) => {

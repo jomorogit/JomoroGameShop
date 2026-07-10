@@ -13,7 +13,6 @@ export default function robots(): MetadataRoute.Robots {
         '/wishlist'
       ],
     },
-    // Если у тебя будет sitemap.xml, укажи его тут (опционально)
-    // sitemap: 'https://твой-домен.com/sitemap.xml', 
+   
   };
 }

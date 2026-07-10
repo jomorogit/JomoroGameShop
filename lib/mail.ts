@@ -20,9 +20,9 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// --------------------------------------------------------
+
 // 1. Purchase Receipt Email
-// --------------------------------------------------------
+
 export const sendPurchaseReceiptEmail = async (email: string, orderId: string, items: PurchaseItem[]) => {
   const totalAmount = items.reduce((sum, item) => sum + item.priceEur, 0);
   
@@ -134,14 +134,14 @@ export const sendPurchaseReceiptEmail = async (email: string, orderId: string, i
         cid: 'logo' 
       }]
     });
-    console.log("Purchase receipt sent successfully! 📧");
+    console.log("Purchase receipt sent successfully!");
   } catch (error) {
-    console.error("Failed to send purchase receipt ❌:", error);
+    console.error("Failed to send purchase receipt:", error);
   }
 };
-// --------------------------------------------------------
+
 // 2. Verification Email
-// --------------------------------------------------------
+
 export const sendVerificationEmail = async (email: string, token: string) => {
   try {
     await transporter.sendMail({
@@ -207,16 +207,16 @@ export const sendVerificationEmail = async (email: string, token: string) => {
         cid: 'logo' 
       }]
     });
-    console.log("Verification email sent successfully! 📧");
+    console.log("Verification email sent successfully!");
   } catch (error) {
-    console.error("Failed to send verification email ❌:", error);
+    console.error("Failed to send verification email:", error);
   }
 };
 
 
-// --------------------------------------------------------
+
 // 3. Account Deletion Confirmation Email
-// --------------------------------------------------------
+
 export const sendDeletionConfirmationEmail = async (email: string, token: string) => {
   try {
     await transporter.sendMail({
@@ -282,15 +282,15 @@ export const sendDeletionConfirmationEmail = async (email: string, token: string
         cid: 'logo' 
       }]
     });
-    console.log("Account deletion confirmation email sent successfully! 📧");
+    console.log("Account deletion confirmation email sent successfully!");
   } catch (error) {
-    console.error("Failed to send account deletion email ❌:", error);
+    console.error("Failed to send account deletion email :", error);
   }
 };
 
-// --------------------------------------------------------
+
 // 4. Account Deleted Notification Email (GDPR Compliance)
-// --------------------------------------------------------
+
 export const sendAccountDeletedEmail = async (email: string) => {
   try {
     await transporter.sendMail({
@@ -338,8 +338,8 @@ export const sendAccountDeletedEmail = async (email: string) => {
         cid: 'logo' 
       }]
     });
-    console.log("Account deleted notification email sent successfully! 📧");
+    console.log("Account deleted notification email sent successfully!");
   } catch (error) {
-    console.error("Failed to send account deletion notification email ❌:", error);
+    console.error("Failed to send account deletion notification email:", error);
   }
 };
