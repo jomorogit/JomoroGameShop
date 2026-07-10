@@ -5,6 +5,7 @@ import CreateCard from "@/app/components/HomeItem";
 import DropList from "@/app/components/DropList";
 import { authConfig } from "../../configs/auth";
 import { getServerSession } from "next-auth"
+import { getCachedGames } from "@/app/utils/db-queries";
 
 const SORT_OPTIONS: Record<string, Prisma.GameOrderByWithRelationInput> = {
     Default: { id: 'desc' },
@@ -108,15 +109,17 @@ export default async function Store(props: {
         });
     }
 
-    const games = await prisma.game.findMany({
-        where: {
-            AND: andFilters
-        },
-        orderBy: currentOrderBy,
-        include: {
-            game_genres: { include: { genre: true } }
-        }
-    });
+
+    const games = await getCachedGames();
+    // const games = await prisma.game.findMany({
+    //     where: {
+    //         AND: andFilters
+    //     },
+    //     orderBy: currentOrderBy,
+    //     include: {
+    //         game_genres: { include: { genre: true } }
+    //     }
+    // });
 
     return (
         <div className="w-auto mt-24 lg:pl-10 lg:pr-10 pl-4 pr-4 lg:flex">
@@ -137,7 +140,7 @@ export default async function Store(props: {
 
                 <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4 gap-4 md:gap-8">
                     {games.length > 0 ? (
-                        // заменил типизацию map
+                       
                         games.map((game: typeof games[number]) => (
                             <CreateCard 
                                 key={game.id}

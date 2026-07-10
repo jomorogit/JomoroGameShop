@@ -6,22 +6,13 @@ import { prisma } from '@/lib/prisma';
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { authConfig } from "../configs/auth";
+import { getCachedGames } from "../utils/db-queries";
+
 
 export default async function Home() {
   const session = await getServerSession(authConfig);
 
-  const games = await prisma.game.findMany({
-    where: { id: { not: 1 } },
-    // Передаем массив для последовательной сортировки
-    orderBy: [
-      { rating_summary: 'desc' }, 
-      { id: 'desc' }    
-    ],
-    include: {
-      game_genres: { include: { genre: true } }
-    }
-  });
-
+  const games = await getCachedGames();
 
   let cartGameIds: number[] = [];
   let wishlistGameIds: number[] = [];
@@ -38,7 +29,7 @@ export default async function Home() {
         where: { user_id: userFromDb.id },
         select: { game_id: true }
       });
-      // Строго типизируем перебор через typeof массива 💎
+      // Строго типизируем перебор через typeof массива
       cartGameIds = cartItems.map((item: typeof cartItems[number]) => item.game_id);
 
       const wishlistItems = await prisma.wishlist.findMany({ 
@@ -67,6 +58,7 @@ export default async function Home() {
           fill 
           priority={true} 
           className="object-cover object-center -z-10" 
+          sizes="100vw"
         />
 
         <div className="relative z-10 pl-6 md:pl-15 flex flex-col h-full justify-center bg-gradient-to-r from-black/50 via-transparent to-transparent">

@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import cloudinary from "@/lib/cloudinary";
+import { revalidateTag } from 'next/cache';
 
 /**
  * Преобразует строку в безопасный URL-slug.
@@ -52,7 +53,7 @@ const safeDate = (dateValue: FormDataEntryValue | null): Date | null => {
 };
 
 /**
- * Серверное действие (Server Action) для создания новой записи игры в базе данных.
+  Серверное действие (Server Action) для создания новой записи игры в базе данных.
  * Обрабатывает FormData, выполняет загрузку медиаресурсов и сохраняет реляционную структуру.
  */
 export async function createGame(formData: FormData) {
@@ -196,7 +197,8 @@ export async function createGame(formData: FormData) {
             },
         });
 
-        revalidatePath("/", "layout"); // Сброс кэша Next.js для обновления данных на клиенте
+        revalidatePath("/", "layout"); 
+        revalidateTag('games', {});
         return { success: true, id: newGame.id };
 
     } catch (error) {
