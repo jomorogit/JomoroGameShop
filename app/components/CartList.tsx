@@ -14,12 +14,13 @@ export default function CartList() {
    
     if (error) return <div className="text-white">Cart error</div>;
       if (data.length === 0) {
-            return <div className="p-10 text-white text-center text-3xl mt-50 flex flex-col items-center">
+        return (
+            <div className="p-10 text-white text-center text-3xl mt-50 flex flex-col items-center">
                 Your cart is empty
                 <Link href="/store" className='block border-2 border-purple-800 rounded-2xl w-60 p-2 mt-4'>Explore Shop</Link>
-                </div>;
-
-        }
+            </div>
+        );
+    }
     return (
         <div className="w-full">
 
