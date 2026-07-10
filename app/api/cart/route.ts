@@ -39,17 +39,18 @@ export async function GET() {
          return NextResponse.json({ error: 'Games not found' }, { status: 404 }); 
     }
 
+
     
-    
-    return NextResponse.json({ 
-    games: cart.map(item => ({
-        ...item.game,
-        game_genres: item.game.game_genres,
-        wishlist: item.game.wishlist
-    })),  
-    });
+   return NextResponse.json({ 
+            games: cart.map(item => ({
+                ...item.game,
+                game_genres: item.game.game_genres,
+                wishlist: item.game.wishlist
+            }))
+        }, { status: 200 });
     
     }catch(error){
         console.log("Error", error)
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }

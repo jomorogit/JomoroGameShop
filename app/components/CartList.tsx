@@ -5,6 +5,28 @@ import useSWR from 'swr';
 import CartSkeleton from './CartSkeleton';
 import Link from 'next/link';
 
+
+export interface GameCardProps {
+  id: number;
+  title: string;
+  price: number; // Это то, что ты передаешь в компонент (после Number())
+  price_eur?: number | string; // Добавим для проверки в объекте
+  release_date?: string | Date | null;
+  image: string; // Это то, что ты передаешь в компонент
+  card_img?: string | null;
+  main_img?: string | null;
+  rating_summary: number;
+  order?: number;
+  added_at?: string;
+  // Исправлено: название поля должно совпадать с тем, что в API
+  game_genres?: {
+    genre: {
+      name: string;
+    };
+  }[];
+  // Добавлено поле, которое ты используешь в коде
+  wishlist?: { added_at: string | Date }[];
+}
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function CartList() {
@@ -13,7 +35,13 @@ export default function CartList() {
 
    
     if (error) return <div className="text-white">Cart error</div>;
-      if (data.length === 0) {
+    if (isLoading || !data) {
+        return <CartSkeleton />;
+    }
+
+    // 2. Теперь, когда мы уверены, что data существует, проверяем длину
+    // Если твой API возвращает объект { games: [...] }, то проверять нужно data.games.length
+    if (data.length === 0) {
         return (
             <div className="p-10 text-white text-center text-3xl mt-50 flex flex-col items-center">
                 Your cart is empty
@@ -29,7 +57,7 @@ export default function CartList() {
             ) : (
                 <div className="lg:w-[70%] h-full">
                     {/* data.games — это массив, который отдает наш API */}
-                     {data.map((game: typeof data[number], index: number) => (
+                     {data?.games?.map((game: GameCardProps, index: number) => (
                         <CartCardCreator 
                             key={game.id}
                             id={game.id}
