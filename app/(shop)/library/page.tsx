@@ -10,7 +10,7 @@ export default async function Library() {
     if (!session?.user?.id || !session?.user?.email) {
         return (
             <div className="w-full text-center mt-20 text-xl text-red-500 font-bold">
-                ⚠️ Authentication error. Please log in.
+                Authentication error. Please log in.
             </div>
         );
     }
@@ -40,9 +40,7 @@ export default async function Library() {
                                 price={Number(game.price_eur || 0)} 
                                 image={game?.card_img || game?.main_img || 'https://res.cloudinary.com/dla93ueam/image/upload/v1778947999/Gemini_Generated_Image_w233n0w233n0w233_qgcacd.png'}
                                 rating_summary={Number(game.rating_summary || 0)}
-                                initialIsInCart={false} 
-                                initialIsWished={false}
-                                initialIsLibrary={true}
+                               
                             />
                         );
                     })
