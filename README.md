@@ -1,36 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GameShop
 
-## Getting Started
+> A Full-Stack E-commerce Platform, featuring seamless Stripe payments and automated AI content generation.
 
-First, run the development server:
+**LIVE DEMO:** [https://jomoro-game-shop.vercel.app/](https://jomoro-game-shop.vercel.app/)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Preview & Screenshots
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+![GameShop Home Screen](https://github.com/user-attachments/assets/91357c53-6e20-4eb5-b355-66aeb466ed6f)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Video Walkthrough & AI Demo
 
-## Learn More
+ **[Watch the full project & AI Automation Demo on YouTube](https://www.youtube.com/watch?v=p04_zSSU5PY)**
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## AI Features & Automation
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+* **Automated Content Generation:** Integrated Gemini API to automatically generate rich descriptions, and assign relevant category tags.
+* **Smart Cataloging:** Eliminates manual data entry by converting raw titles into fully filled product cards with optimized JSON structures.
 
-## Deploy on Vercel
+## Core Functionality
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+* **Secure Checkouts:** Full Stripe API integration handling multi-currency transactions in Euro (EUR).
+* **Advanced Querying:** Fast, low-latency product filtering and catalog browsing using customized relational database schemas.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## Tech Stack
+
+* **Frontend:** React 19, Next.js 16, TypeScript, Tailwind CSS
+* **Backend:** Next.js: Server Actions / Route Handlers
+* **Database & ORM:** PostgreSQL, Prisma ORM
+* **NodeMailer**
+* **Stripe API**
+* **NextAuth**
+* **Cloudinary**
+* **Gemini API**
+* **Deployment:** Vercel
+  
+
+---
+
+##  **Contact**
+Illia Kots - [LinkedIn](https://www.linkedin.com/in/illia-kots-1b5b15356/) - illa08878@gmail.com
