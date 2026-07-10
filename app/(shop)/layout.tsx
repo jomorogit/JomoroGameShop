@@ -49,7 +49,10 @@ export default async function RootLayout({
         <div className="w-full h-auto min-h-20 bg-[#23122E]"><Footer /></div>
         
         {/* Передаем данные пропсами */}
-        <TabBar initialBalance={userData.balance} initialCartCount={userData.cartCount} />
+        <TabBar 
+          initialBalance={userData?.balance ?? "0.00"} 
+          initialCartCount={userData?.cartCount ?? 0} 
+        />
       </ToastProvider>
     </Provider>
   );

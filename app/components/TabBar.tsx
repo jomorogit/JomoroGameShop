@@ -9,7 +9,14 @@ import ShopIcon from '../icons/store.svg'
 import HomeIcon from '../icons/house.svg'
 import { ShoppingCart, ChevronLeft, Wallet, Library, Heart, LogOut, CircleUser } from "lucide-react"
 
-export default function TabBar({ initialBalance, initialCartCount }: { initialBalance: string, initialCartCount: number }) {
+export default function TabBar({ 
+  initialBalance = "0.00", 
+  initialCartCount = 0 
+}: { 
+  initialBalance?: string, 
+  initialCartCount?: number 
+}) {
+    
     const pathname = usePathname();
     const [isBurger, setIsBurger] = useState<boolean>(false);
 
