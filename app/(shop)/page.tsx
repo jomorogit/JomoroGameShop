@@ -18,6 +18,7 @@ export default async function Home() {
           alt="Hollow Knight Silksong"
           fill 
           priority={true} 
+          fetchPriority="high"
           className="object-cover object-center -z-10" 
           sizes="100vw"
         />
