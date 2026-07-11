@@ -22,6 +22,7 @@ export async function POST(req: Request) {
     // Верификация подписи вебхука Stripe
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
   } catch (err) {
+    console.error(`Webhook signature verification failed: ${err}`);
     return NextResponse.json({ error: `Webhook Error: ${err}` }, { status: 400 });
   }
 
@@ -36,21 +37,26 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'No userId in metadata' }, { status: 400 });
     }
 
+    // Проверка на дублирование транзакций
+    const alreadyProcessed = await prisma.transaction.findFirst({
+      where: { stripe_session_id: session.id }
+    });
+    if (alreadyProcessed) {
+      console.log(`Transaction ${session.id} already processed. Skipping...`);
+      return NextResponse.json({ received: true }, { status: 200 });
+    }
+
+    
     // ОПЕРАЦИЯ: ПОПОЛНЕНИЕ БАЛАНСА ПОЛЬЗОВАТЕЛЯ
+     
     if (paymentType === 'refill') {
       try {
         await prisma.$transaction(async (tx) => {
-          // 1. Инкремент баланса пользователя в модели User
           await tx.user.update({
             where: { id: Number(userId) },
-            data: {
-              balance_eur: {
-                increment: amountTotal 
-              }
-            }
+            data: { balance_eur: { increment: amountTotal } }
           });
 
-          // 2. Логирование финансовой операции в таблице транзакций
           await tx.transaction.create({
             data: {
               user_id: Number(userId),
@@ -61,29 +67,28 @@ export async function POST(req: Request) {
           });
         });
 
-        console.log(`Users #${userId} balance has been successfully topped up by ${amountTotal}€`);
+        console.log(`User #${userId} balance topped up by ${amountTotal}€`);
         return NextResponse.json({ received: true }, { status: 200 });
-
       } catch (dbError) {
-        console.error('❌ Error while replenishing balance in the database:', dbError);
+        console.error('Error during balance refill transaction:', dbError);
         return NextResponse.json({ error: 'Database transaction failed' }, { status: 500 });
       }
     }
 
-    // ОПЕРАЦИЯ: ПРЯМАЯ ПОКУПКА ОДНОЙ ИГРЫ
+   
+     // ОПЕРАЦИЯ: ПРЯМАЯ ПОКУПКА ОДНОЙ ИГРЫ
+    
     if (paymentType === 'single_purchase') {
       try {
         const gameId = session.metadata?.gameId;
 
         await prisma.$transaction(async (tx) => {
-          // 1. Получение данных об игре для фиксации стоимости на момент покупки
           const game = await tx.game.findUnique({ 
             where: { id: Number(gameId) } 
           });
           
           if (!game) throw new Error("Game not found in webhook");
 
-          // 2. Добавление игры в цифровую библиотеку пользователя
           await tx.library.create({
             data: {
               user_id: Number(userId),
@@ -93,12 +98,9 @@ export async function POST(req: Request) {
           });
           
           await tx.cart.deleteMany({
-              where: {
-                  game_id: Number(gameId),
-                  user_id: Number(userId),
-              }
+              where: { game_id: Number(gameId), user_id: Number(userId) }
           });
-          // 3. Создание финансовой транзакции и атомарное связывание с купленной игрой
+
           await tx.transaction.create({
             data: {
               user_id: Number(userId),
@@ -114,37 +116,35 @@ export async function POST(req: Request) {
             }
           });
 
-          // 4. Асинхронная отправка email-чека внутри контекста транзакции
           if (customerEmail) {
             sendPurchaseReceiptEmail(customerEmail, session.id, [
               { title: game.title, priceEur: Number(game.price_eur) }
-            ])
-            .then(() => console.log(`Check for the game ${game.title}successfully sent to ${customerEmail}`))
-            .catch((err) => console.error("Failed to send check:", err));
+            ]).catch((err) => console.error("Email error:", err));
           }
         });
 
         return NextResponse.json({ received: true }, { status: 200 });
-
       } catch (error) {
+        console.error('Single purchase transaction failed:', error);
         return NextResponse.json({ error: 'Transaction failed' }, { status: 500 });
       }
     }
 
-    // ОПЕРАЦИЯ: ЧАСТИЧНАЯ ОПЛАТА С ВНЕШНЕЙ КАРТЫ С ОБНУЛЕНИЕМ ВНУТРЕННЕГО БАЛАНСА
+ 
+     // ОПЕРАЦИЯ: ЧАСТИЧНАЯ ОПЛАТА С КАРТЫ С УМЕНЬШЕНИЕМ БАЛАНСА
+    
     if (paymentType === 'partial_balance_purchase') {
       try {
          const gameId = session.metadata?.gameId;
+         const balanceToDecrement = Number(session.metadata?.balanceToDecrement || 0);
 
          await prisma.$transaction(async (tx) => {
-           // 1. Получение целевой игры
            const game = await tx.game.findUnique({ 
             where: { id: Number(gameId) } 
           });
 
           if (!game) throw new Error("Game not found in webhook");
 
-          // 2. Регистрация игры в библиотеке пользователя
           await tx.library.create({
             data: {
               user_id: Number(userId),
@@ -154,12 +154,9 @@ export async function POST(req: Request) {
           });
           
           await tx.cart.deleteMany({
-              where: {
-                  game_id: Number(gameId),
-                  user_id: Number(userId),
-              }
+              where: { game_id: Number(gameId), user_id: Number(userId) }
           });
-          // 3. Фиксация транзакции (сумма отражает только доплату через Stripe)
+
           await tx.transaction.create({
             data: {
               user_id: Number(userId),
@@ -175,76 +172,65 @@ export async function POST(req: Request) {
             }
           });
 
-          // 4. Обнуление баланса пользователя, так как остаток стоимости был списан со счета
+          // ЗАЩИТА: Безопасно вычитаем ровно зафиксированную сумму доплаты, вместо жесткого обнуления
           await tx.user.update({
-            where: {
-              id: Number(userId),
-            },
+            where: { id: Number(userId) },
             data: {
-              balance_eur: 0.00
+              balance_eur: { decrement: balanceToDecrement }
             }
           });
 
-          // 5. Отправка email-уведомления о покупке
           if (customerEmail) {
             sendPurchaseReceiptEmail(customerEmail, session.id, [
               { title: game.title, priceEur: Number(game.price_eur) }
-            ])
-            .then(() => console.log(` Check for the game ${game.title} successfully sent to ${customerEmail}`))
-            .catch((err) => console.error("Failed to send check:", err));
+            ]).catch((err) => console.error("Email error:", err));
           }
          });
          
          return NextResponse.json({ received: true }, { status: 200 });
       } catch (error) {
+        console.error('Partial balance purchase transaction failed:', error);
         return NextResponse.json({ error: 'Database transaction failed' }, { status: 500 });
       }
     }
  
-    // ОПЕРАЦИЯ: ГРУППОВАЯ ПОКУПКА ИГР ИЗ КОРЗИНЫ
+    
+     // ОПЕРАЦИЯ: ГРУППОВАЯ ПОКУПКА ИГР ИЗ КОРЗИНЫ
+    
     if (paymentType === 'purchase') {
-      let purchasedItemsForEmail: { title: string; priceEur: number }[] = [];
-
       try {
+        // ЗАЩИТА: Извлекаем ID игр из метаданных Stripe, а не из живой корзины пользователя
+        const gameIds: number[] = JSON.parse(session.metadata?.gameIds || '[]');
+        
+        if (gameIds.length === 0) {
+          return NextResponse.json({ error: 'No games found in metadata' }, { status: 400 });
+        }
+
+        let purchasedItemsForEmail: { title: string; priceEur: number }[] = [];
+
         await prisma.$transaction(async (tx) => {
-          // 1. Извлечение текущего содержимого корзины пользователя до совершения деструктивных операций
-          const cartItems = await tx.cart.findMany({
-            where: { user_id: Number(userId) },
-            include: {
-              game: {
-                select: {
-                  title: true,
-                  price_eur: true, 
-                },
-              },
-            },
+          // Выбираем игры, которые были зафиксированы на момент оплаты
+          const games = await tx.game.findMany({
+            where: { id: { in: gameIds } }
           });
 
-          if (cartItems.length === 0) {
-            return;
-          }
-          
-          await tx.cart.deleteMany({
-              where: {
-                  user_id: Number(userId),
-              }
-          });
-          // Формирование массива данных для отправки отчета на email
-          purchasedItemsForEmail = cartItems.map(item => ({
-            title: item.game?.title || "Unknown Game",
-            priceEur: item.game?.price_eur ? Number(item.game.price_eur) : 0
+          if (games.length === 0) throw new Error("No real games matched Stripe metadata IDs");
+
+          purchasedItemsForEmail = games.map(game => ({
+            title: game.title,
+            priceEur: Number(game.price_eur || 0)
           }));
 
-          // 2. Множественное добавление купленных позиций в библиотеку
+          // Массово создаем игры в библиотеке пользователя
           await tx.library.createMany({
-            data: cartItems.map((item) => ({
+            data: games.map((game) => ({
               user_id: Number(userId),
-              game_id: item.game_id,
-              purchase_price_eur: item.game?.price_eur ? Number(item.game.price_eur) : 0,
+              game_id: game.id,
+              purchase_price_eur: Number(game.price_eur || 0),
             })),
           });
 
-          // 3. Создание агрегирующей транзакции со списком всех оплаченных позиций
+          // Регистрируем финансовую операцию
           await tx.transaction.create({
             data: {
               user_id: Number(userId),
@@ -253,31 +239,28 @@ export async function POST(req: Request) {
               payment_type: 'Purchase', 
               transaction_games: {
                 createMany: {
-                  data: cartItems.map((item) => ({
-                    game_id: item.game_id,
-                    price_paid_eur: item.game?.price_eur ? Number(item.game.price_eur) : 0, 
+                  data: games.map((game) => ({
+                    game_id: game.id,
+                    price_paid_eur: Number(game.price_eur || 0), 
                   })),
                 },
               },
             },
           });
 
-          // 4. Очистка корзины пользователя после успешного импорта в библиотеку
+          // Очищаем из корзины пользователя ТОЛЬКО те позиции, которые он успешно оплатил
           await tx.cart.deleteMany({
-            where: { user_id: Number(userId) },
+            where: { user_id: Number(userId), game_id: { in: gameIds } },
           });
         });
 
-        // 5. Отправка сводного email-чека по всем позициям из корзины
         if (customerEmail && purchasedItemsForEmail.length > 0) {
-          sendPurchaseReceiptEmail(customerEmail, session.id, purchasedItemsForEmail)
-            .then(() => console.log(`The check has been successfully sent to ${customerEmail}`))
-            .catch(() => console.error(" Failed to send check"));
-        } else {
-          console.warn(`⚠️ Shipment cancelled: recipient address missing or product list empty.`);
+          sendPurchaseReceiptEmail(customerEmail, session.id, purchasedItemsForEmail).catch(console.error);
         }
 
+        return NextResponse.json({ received: true }, { status: 200 });
       } catch (error) {
+        console.error('Cart group purchase transaction failed:', error);
         return NextResponse.json({ error: 'Database transaction failed' }, { status: 500 });
       }
     }

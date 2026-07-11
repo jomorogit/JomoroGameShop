@@ -2,6 +2,8 @@ import CartList from '@/app/components/CartList';
 import CheckoutButton from '@/app/ui/CheckoutButton';
 import CartSummary from '@/app/components/CartSummary';
 import CartSummuryData from "@/app/components/CartSummuryData";
+import { Suspense } from 'react';
+
 export default function Cart(){
     return(
         <div className='mt-20 pl-4 pr-4 lg:pl-10 lg:pr-10 w-full mr-10'>   

@@ -8,10 +8,10 @@ import { Prisma } from "@prisma/client";
 import { sendPurchaseReceiptEmail } from "@/lib/mail";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-
-
-// Если в системе есть NEXT_PUBLIC_APP_URL (на Vercel), берем его, иначе — localhost.
 const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+
+
+ //1. ОПЛАТА ВСЕЙ КОРЗИНЫ
 
 export async function createCheckoutSession() {
   try {
@@ -20,29 +20,22 @@ export async function createCheckoutSession() {
         return { error: "User not authorized" };
      }
 
-     const res = await prisma.cart.findMany({
-        where: {
-            user_id: Number(session.user.id)
-        },
+     const cartItems = await prisma.cart.findMany({
+        where: { user_id: Number(session.user.id) },
         include: {
-            game: {
-                select: {
-                    price_eur: true,
-                }
-            }
+            game: { select: { price_eur: true } }
          }
      });
 
-     if (res.length === 0) {
+     if (cartItems.length === 0) {
         return { error: "Your cart is empty" };
      }
 
-     const totalEuro = res.reduce((acc, current) => {
+     const totalEuro = cartItems.reduce((acc, current) => {
         const price = current.game?.price_eur ? current.game.price_eur.toNumber() : 0; 
         return acc + price;
      }, 0);
 
-     // перевод в центы
      const amountInCents = Math.round(totalEuro * 100);
 
      // Создаем сессию в Stripe
@@ -65,6 +58,8 @@ export async function createCheckoutSession() {
        metadata: {
          userId: session.user.id,
          type: 'purchase',
+         //ЗАЩИТА: Фиксируем ID игр в Stripe, чтобы их нельзя было подменить в процессе оплаты
+         gameIds: JSON.stringify(cartItems.map(item => item.game_id)), 
        },
        success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
        cancel_url: `${baseUrl}/cart`,
@@ -78,6 +73,9 @@ export async function createCheckoutSession() {
   }
 }
 
+
+ // 2. ПОПОЛНЕНИЕ ВНУТРЕННЕГО БАЛАНСА КОШЕЛЬКА
+ 
 export async function RefilMoney(finalAmount: number) {
   try {
     const session = await getServerSession(authConfig);
@@ -87,9 +85,8 @@ export async function RefilMoney(finalAmount: number) {
      if (!finalAmount || finalAmount < 2) {
       return { error: "Not valid value"};
      }
-      const amountInCents = Math.round(finalAmount * 100);
+     const amountInCents = Math.round(finalAmount * 100);
 
-     // Создаем сессию в Stripe
      const stripeSession = await stripe.checkout.sessions.create({
        payment_method_types: ['card'],
        mode: 'payment',
@@ -99,7 +96,7 @@ export async function RefilMoney(finalAmount: number) {
            price_data: {
              currency: 'eur',
              product_data: {
-               name: `GameShop refil for User #${session.user.id}`,
+               name: `GameShop refill for User #${session.user.id}`,
              },
              unit_amount: amountInCents, 
            },
@@ -120,6 +117,8 @@ export async function RefilMoney(finalAmount: number) {
   }
 }
 
+ // 3. ПРЯМАЯ ПОКУПКА ОДНОЙ ИГРЫ (БЕЗ БАЛАНСА)
+ 
 export async function createCheckoutSessionGame(game_id: number) {
   try {
     const session = await getServerSession(authConfig);
@@ -169,6 +168,9 @@ export async function createCheckoutSessionGame(game_id: number) {
   }
 }
 
+
+ // 4. ОПЛАТА ИГРЫ С БАЛАНСА ИЛИ ЧАСТИЧНАЯ ДОПЛАТА КАРТОЙ
+ 
 export async function PayGameWithBalance(gameId: number) {
   try {
     const session = await getServerSession(authConfig);
@@ -177,40 +179,30 @@ export async function PayGameWithBalance(gameId: number) {
     }
 
     const user = await prisma.user.findUnique({
-      where: {
-        id: Number(session.user.id),
-        email: session.user.email,
-      }
+      where: { id: Number(session.user.id), email: session.user.email }
     });
-
-    if (!user) {
-      return { error: "User is not found" };
-    }
 
     const game = await prisma.game.findUnique({
-      where: {
-        id: gameId,
-      }
+      where: { id: gameId }
     });
 
-    if (!game) {
-      return { error: "Game is not found" };
+    if (!user || !game) {
+      return { error: "User or Game not found" };
     }
 
     const userBalance = Number(user.balance_eur);
     const gamePrice = Number(game.price_eur);
 
+   // Вариант А: Баланса хватает на полную покупку
    if (userBalance >= gamePrice) {
     const transaction = await prisma.$transaction(async (tx) => {
       
-      // 1. Создаем чек в БД
       const newTransaction = await tx.transaction.create({
         data: {
           amount_eur: new Prisma.Decimal(gamePrice),
           payment_type: "Purchase",
           stripe_session_id: `balance_${crypto.randomUUID()}`,
           user_id: Number(session.user.id), 
-
           transaction_games: {
             create: {
               game_id: gameId,
@@ -222,14 +214,9 @@ export async function PayGameWithBalance(gameId: number) {
 
       await tx.library.upsert({
         where: {
-          game_id_user_id: {
-            game_id: gameId,
-            user_id: Number(session.user.id),
-          },
+          game_id_user_id: { game_id: gameId, user_id: Number(session.user.id) },
         },
-        update: {
-          purchase_price_eur: new Prisma.Decimal(gamePrice),
-        },
+        update: { purchase_price_eur: new Prisma.Decimal(gamePrice) },
         create: {
           game_id: gameId,
           user_id: Number(session.user.id),
@@ -237,19 +224,13 @@ export async function PayGameWithBalance(gameId: number) {
         },
       });
 
-      await tx.cart.delete({
-        where: {
-          user_id_game_id: {
-            user_id: Number(session.user.id),
-            game_id: Number(gameId),
-          },
-        },
+      // Используем безопасный deleteMany, чтобы избежать падения, если товара нет в корзине
+      await tx.cart.deleteMany({
+        where: { user_id: Number(session.user.id), game_id: Number(gameId) },
       });
       
       await tx.user.update({
-        where: {
-          id: Number(session.user.id),
-        },
+        where: { id: Number(session.user.id) },
         data: {
           balance_eur: { decrement: new Prisma.Decimal(gamePrice) }
         }
@@ -264,17 +245,18 @@ export async function PayGameWithBalance(gameId: number) {
           { title: game.title, priceEur: gamePrice }
         ]);
       } catch (mailError) {
-        console.error("❌ Unable to send email, but purchase completed:", mailError);
+        console.error(" Email failed:", mailError);
       }
     }
-    const paymentType = "AccountBalance";
-    return { success: "The purchase was successful", paymentType }
+    return { success: "The purchase was successful", paymentType: "AccountBalance" };
   }
-    if (userBalance < gamePrice) {
-      const paySum = gamePrice - userBalance;
-      const amountInCents = Math.round(paySum * 100);
+  
+  // Вариант Б: Баланса не хватает, генерируем сессию доплаты через Stripe
+  if (userBalance < gamePrice) {
+    const paySum = gamePrice - userBalance;
+    const amountInCents = Math.round(paySum * 100);
       
-      const stripeSession = await stripe.checkout.sessions.create({
+    const stripeSession = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       mode: 'payment',
       currency: 'eur',
@@ -283,7 +265,7 @@ export async function PayGameWithBalance(gameId: number) {
           price_data: {
             currency: 'eur',
             product_data: {
-              name: `${game.title} - GameShop`, 
+              name: `${game.title} - Partial Balance Payment`, 
             },
             unit_amount: amountInCents, 
           },
@@ -294,6 +276,8 @@ export async function PayGameWithBalance(gameId: number) {
         userId: session.user.id,
         gameId: String(game.id),
         type: 'partial_balance_purchase',
+        // ЗАЩИТА: Фиксируем точную сумму списания с баланса, чтобы не обнулить кошелек «вслепую»
+        balanceToDecrement: String(userBalance), 
       },
       success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/cart`,
@@ -304,6 +288,6 @@ export async function PayGameWithBalance(gameId: number) {
     
   } catch (error) {
     console.error("Payment error log:", error); 
-    return { error: "Failed to process single-game payment" };
+    return { error: "Failed to process payment" };
   }
 }

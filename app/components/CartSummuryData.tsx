@@ -10,11 +10,17 @@ export default function CartSummuryData() {
 
     if (error) return <div className="text-white">Error loading summary</div>;
 
-    if (isLoading) {
+   if (isLoading) {
         return (
-            <div className="animate-pulse space-y-4">
-                <div className="h-4 bg-[#3B2A46] rounded w-3/4"></div>
-                <div className="h-4 bg-[#3B2A46] rounded w-1/2"></div>
+            <div className="animate-pulse space-y-6 mb-10">
+                <div className="flex justify-between">
+                    <div className="h-4 bg-[#3B2A46] rounded w-3/4"></div>
+                    <div className="h-4 bg-[#3B2A46] rounded w-12"></div>
+                </div>
+                <div className="flex justify-between">
+                    <div className="h-4 bg-[#3B2A46] rounded w-1/2"></div>
+                    <div className="h-4 bg-[#3B2A46] rounded w-12"></div>
+                </div>
             </div>
         );
     }
