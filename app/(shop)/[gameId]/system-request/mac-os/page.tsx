@@ -34,7 +34,7 @@ export default async function MacOS({ params }: { params: Promise<{ gameId: stri
   type ReqType = typeof game.system_requirements[number];
 
   const isMacSupported = game.system_requirements.length > 0 && 
-                         game.system_requirements.some((req: ReqType) => req.cpu !== null);
+  game.system_requirements.some((req: ReqType) => req.cpu !== null);
 
   const minReqs = game.system_requirements.filter((req: ReqType) => !req.is_recommended);
   const recReqs = game.system_requirements.filter((req: ReqType) => req.is_recommended);

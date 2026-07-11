@@ -1,4 +1,3 @@
-// app/wishlist/page.tsx
 import { Suspense } from 'react';
 import WishListSkeleton from "@/app/components/WishListSkeleton";
 import WishListContent from "@/app/components/WishlistContent";

@@ -32,7 +32,7 @@ export default async function Linux({ params }: { params: Promise<{ gameId: stri
 
   type ReqType = typeof game.system_requirements[number];
   const isLinuxSupported = game.system_requirements.length > 0 && 
-                           game.system_requirements.some((req: ReqType) => req.cpu !== null);
+  game.system_requirements.some((req: ReqType) => req.cpu !== null);
 
   // Разделяем требования на две группы
   const minReqs = game.system_requirements.filter((req: ReqType) => !req.is_recommended);
@@ -62,7 +62,7 @@ export default async function Linux({ params }: { params: Promise<{ gameId: stri
       {!isLinuxSupported ? (
         <div className="w-full text-center py-6 bg-red-950/30 border border-red-900/50 rounded-xl">
           <p className="text-red-400 text-lg font-medium">
-            ❌ This game is not supported on Linux
+          This game is not supported on Linux
           </p>
         </div>
       ) : (

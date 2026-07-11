@@ -113,10 +113,10 @@ export default function CreateGame() {
 
     const [title, setTitle] = useState(""); // Состояние пользовательского ввода названия игры
     const [showGeminiBtn, setShowGeminiBtn] = useState(false); // Флаг отображения компонента интеграции с Gemini API
-    const [isAiLoading, setIsAiLoading] = useState(false); // Состояние ожидания ответа от Gemini API
+    const [isAiLoading, setIsAiLoading] = useState(false); // Состояние ожидания ответа
     const [genres, setGenres] = useState<Genre[]>([]); // Массив доступных жанров из репозитория БД
 
-    // Задержка отображения кнопки автозаполнения (управление дребезгом ввода / debounce)
+    // Задержка отображения кнопки автозаполнения debounce
     useEffect(() => {
         if (title.length < 3) {
             setShowGeminiBtn(false);
@@ -126,7 +126,7 @@ export default function CreateGame() {
         return () => clearTimeout(timer); 
     }, [title]);
 
-    // Функция посимвольного вывода текста (эффект Typewriter) для UI
+    // Typewriter UI
     const animateText = (fieldName: string, fullText: string) => {
         let currentText = "";
         let index = 0;
@@ -226,7 +226,7 @@ export default function CreateGame() {
     
     // Обработка отправки формы и сериализация данных перед отправкой в Server Action
     const handleFormSubmit = async (formData: FormData) => {
-        setIsLoading(true); // Активация состояния блокировки интерфейса формы
+        setIsLoading(true); 
         try {
             // Формирование структуры локализации на основе выбранных чекбоксов
             const languagesData = LANGUAGES.map(lang => ({
@@ -314,7 +314,7 @@ export default function CreateGame() {
                 router.push('/account/admin'); // Редирект в панель администратора
                 router.refresh(); // Принудительное обновление данных текущего роута
             } else {
-                alert(result?.error || "Error creating game❌");
+                alert(result?.error || "Error creating game");
             }
         } catch (error) {
             console.error(error);
@@ -740,7 +740,7 @@ export default function CreateGame() {
                     disabled={isLoading} // Блокировка вызова до окончания процессов выгрузки медиафайлов и обновления БД
                     className='bg-purple-600 hover:bg-purple-500 py-6 rounded-2xl text-2xl font-bold transition-all active:scale-95 shadow-lg shadow-purple-500/20 disabled:opacity-50'
                 >
-                    {isLoading ? "Uploading Data... ⏳" : "Publish Game "}
+                    {isLoading ? "Uploading Data..." : "Publish Game "}
                 </button>
             </form>
         </div>

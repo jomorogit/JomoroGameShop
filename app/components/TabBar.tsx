@@ -1,6 +1,6 @@
 'use client'
 import { signOut } from "next-auth/react"
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from "next/link";
 import { usePathname } from 'next/navigation' 
@@ -9,16 +9,31 @@ import ShopIcon from '../icons/store.svg'
 import HomeIcon from '../icons/house.svg'
 import { ShoppingCart, ChevronLeft, Wallet, Library, Heart, LogOut, CircleUser } from "lucide-react"
 
-export default function TabBar({ 
-  initialBalance = "0.00", 
-  initialCartCount = 0 
-}: { 
-  initialBalance?: string, 
-  initialCartCount?: number 
-}) {
-    
+import useSWR from 'swr'; 
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
+export default function TabBar() {
+    const { data, error, isLoading } = useSWR('/api/user-data', fetcher);
+
     const pathname = usePathname();
     const [isBurger, setIsBurger] = useState<boolean>(false);
+    const [loadingText, setLoadingText] = useState("Loading...");
+    useEffect(() => {
+        let interval: NodeJS.Timeout;
+
+        if (isLoading) {
+            const stages = ["Loading...", "Loading..", "Loading.", "Loading.."];
+            let step = 0;
+
+            interval = setInterval(() => {
+                step = (step + 1) % stages.length;
+                setLoadingText(stages[step]);
+            }, 400); 
+        }
+
+        return () => clearInterval(interval); 
+    }, [isLoading]);
 
     const getMenuLinkClass = (href: string) => {
         const isActive = pathname === href;
@@ -35,7 +50,7 @@ export default function TabBar({
 
     return (
         <>
-            {/* Мобильное меню */}
+
             <div className={`fixed top-0 left-0 w-full h-[calc(100vh-3.5rem)] bg-[#1a0f2e] z-50 transition-all duration-300 ease-in-out overflow-y-auto ${isBurger ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full pointer-events-none'}`}>
                 {isBurger && (
                     <button className='absolute top-6 left-4 p-2 active:scale-95 transition-transform' onClick={handleClick}>
@@ -52,9 +67,20 @@ export default function TabBar({
                             <Wallet className="text-purple-400 w-5 h-5" />
                             <span className="text-base font-medium text-gray-300">Wallet</span>
                         </Link>
-                        <span className="text-lg font-bold text-emerald-400 bg-emerald-500/10 px-4 py-1 rounded-lg border border-emerald-500/20">
-                            {initialBalance} €
-                        </span>
+                        
+                        {isLoading || !data ? (
+                            <span className="text-sm font-medium text-purple-400/60 animate-pulse bg-purple-500/5 px-4 py-1 rounded-lg border border-purple-500/10 min-w-[90px] text-center">
+                                {loadingText}
+                            </span>
+                        ) : error ? (
+                            <span className="text-sm text-rose-400">Error</span>
+                        ) : (
+                            <Link href="/account/addmoney" className="flex items-center gap-3" onClick={handleClick}>
+                                <span className="text-lg font-bold text-emerald-400 bg-emerald-500/10 px-4 py-1 rounded-lg border border-emerald-500/20">
+                                    {data.balance ?? data.initialBalance} €
+                                </span>
+                            </Link>
+                        )}
                     </div>
                     <hr className="border-white/5" />
                     <Link href="/account/profile" className={getMenuLinkClass("/account/profile")} onClick={handleClick}><CircleUser className="w-5 h-5" /><span>Account</span></Link>
@@ -64,15 +90,16 @@ export default function TabBar({
                 </div>
             </div>
 
-            {/* Нижняя панель */}
             <div className='fixed bottom-0 left-0 w-full bg-[#130a22]/95 backdrop-blur-md h-16 flex justify-around items-center md:hidden z-[60] border-t border-white/5'>
                 <Link href="/" className={getTabClass("/")}><Image src={HomeIcon} alt="home" width={24} height={24} className="w-6 h-6 opacity-50" /></Link>
                 <Link href="/store" className={getTabClass("/store")}><Image src={ShopIcon} alt="store" width={24} height={24} className="w-6 h-6 opacity-50" /></Link>
+                
                 <Link href="/cart" className={getTabClass("/cart")} aria-label="cart">
                     <ShoppingCart className="w-6 h-6 text-gray-400" />
-                    {initialCartCount > 0 && (
-                        <span className="absolute -top-0.5 -right-0.5 bg-rose-600 text-white text-[11px] font-bold min-w-[18px] h-[18px] px-1 flex justify-center items-center rounded-full border border-[#130a22]">
-                            {initialCartCount}
+                    
+                    {!isLoading && data && (data.cartCount ?? data.initialCartCount) > 0 && (
+                        <span className="absolute -top-0.5 -right-0.5 bg-rose-600 text-white text-[11px] font-bold min-w-[18px] h-[18px] px-1 flex justify-center items-center rounded-full border border-[#130a22] animate-fade-in">
+                            {data.cartCount ?? data.initialCartCount}
                         </span>
                     )}
                 </Link>

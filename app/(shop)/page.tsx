@@ -1,16 +1,12 @@
 // app/page.tsx
 import Image from "next/image";
 import SilkSong from "./img/Game1.webp"; 
-import HomeItem from "../components/HomeItem"; 
 import Link from "next/link";
-import { getCachedGames } from "../utils/db-queries";
-
+import HomePageList from "../components/HomePageList";
+import { Suspense } from 'react';
+import HomeSkeletonList from "../components/HomeSkeletonList";
 
 export default async function Home() {
-
-  const games = await getCachedGames();
-
-
   return (
     <div className="w-full mt-24 flex flex-col items-center holographic-container pb-10"> 
       <div 
@@ -44,25 +40,10 @@ export default async function Home() {
       {/* Каталог товаров  */}
       <div className="w-[92%] md:w-[90%] mt-12">
         <h2 className="text-xl md:text-3xl text-white mb-6 md:mb-8 font-semibold">Featured and Recommended</h2>
-        
-        {/* Контейнер для карточек */}
-        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 md:gap-8">
 
-          {games.map((game: typeof games[number]) => {
-        
-            return (
-              <HomeItem 
-                key={game.id}
-                id={game.id}
-                title={game.title}
-                price={Number(game.price_eur)} 
-                image={game?.card_img || game?.main_img || 'https://res.cloudinary.com/dla93ueam/image/upload/v1778947999/Gemini_Generated_Image_w233n0w233n0w233_qgcacd.png'}
-                rating_summary={Number(game.rating_summary || 0)}
-              />
-            );
-          })}
-
-        </div>
+            <Suspense fallback={<HomeSkeletonList />}>
+              <HomePageList></HomePageList>
+            </Suspense>
       </div>
     </div>
   );

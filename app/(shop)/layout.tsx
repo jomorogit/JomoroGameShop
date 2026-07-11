@@ -14,24 +14,6 @@ import "../globals.css";
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const session = await getServerSession(authConfig);
-  
-  let userData = { balance: "0.00", cartCount: 0 };
-
-  if (session?.user?.email) {
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-      select: { balance_eur: true, id: true }
-    });
-    
-    if (user) {
-      const cartCount = await prisma.cart.count({ where: { user_id: user.id } });
-      userData = { 
-        balance: Number(user.balance_eur || 0).toFixed(2), 
-        cartCount 
-      };
-    }
-  }
 
   return (
     <Provider>
@@ -49,10 +31,7 @@ export default async function RootLayout({
         <div className="w-full h-auto min-h-20 bg-[#23122E]"><Footer /></div>
         
         {/* Передаем данные пропсами */}
-        <TabBar 
-          initialBalance={userData?.balance ?? "0.00"} 
-          initialCartCount={userData?.cartCount ?? 0} 
-        />
+        <TabBar />
       </ToastProvider>
     </Provider>
   );

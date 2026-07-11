@@ -35,13 +35,13 @@ export default async function Windows({ params }: { params: Promise<{ gameId: st
 
 
   const isWindowsSupported = game.system_requirements.length > 0 && 
-                             game.system_requirements.some((req: ReqType) => req.cpu !== null);
+  game.system_requirements.some((req: ReqType) => req.cpu !== null);
 
 
   const minReqs = game.system_requirements.filter((req: ReqType) => !req.is_recommended);
   const recReqs = game.system_requirements.filter((req: ReqType) => req.is_recommended);
 
-  // Вспомогательная функция для отрисовки — теперь строго типизирована! 🛠️
+  
   const renderReqs = (reqs: ReqType[]) => (
     reqs.map((req: ReqType) => (
       <div key={req.id} className="text-sm space-y-1 mt-2 text-gray-300">

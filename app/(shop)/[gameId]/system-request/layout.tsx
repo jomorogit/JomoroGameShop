@@ -42,17 +42,13 @@ export default async function GameLayout({
       }
 
   return (
-
-          <Provider>
-                      
-                                
-                                <div className="mt-5 bg-[#23122E] rounded-2xl p-5" >
-                                   <ScrollTopLinks></ScrollTopLinks>
-                                    <OSRequestLinks  id={game.id} title={game.title}/>
-                                    {children}
-                                </div>
-                
-        </Provider>
+      <Provider>   
+        <div className="mt-5 bg-[#23122E] rounded-2xl p-5" >
+        <ScrollTopLinks></ScrollTopLinks>
+        <OSRequestLinks  id={game.id} title={game.title}/>
+        {children}
+        </div>        
+      </Provider>
 
  );
 }

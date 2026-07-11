@@ -4,7 +4,7 @@ import React from 'react'
 import ReviewsList from '@/app/components/ReviewsList'
 import ScrollTopLinks from '@/app/hooks/ScrollTopLinks'
 interface PageProps {
-  params: Promise<{ gameId: string }>; // Имя ключа должно совпадать с [папкой]
+  params: Promise<{ gameId: string }>; 
 }
 
 export default async function ReviewsPage({ params }: PageProps) {
