@@ -121,17 +121,17 @@ export default function PayType() {
               const result = await createCheckoutSessionGame(Number(gameId));
         
               if (result?.error) {
-                showToast(`❌ ${result.error}`);
+                showToast(` ${result.error}`);
                 return;
               }
         
               if (result?.url) {
-                showToast("🔄 Redirecting to secure payment...");
+                showToast("Redirecting to secure payment...");
                 window.location.href = result.url; 
               }
             } catch (error) {
               console.error(error);
-              showToast("❌ Something went wrong. Please try again.");
+              showToast("Something went wrong. Please try again.");
             } finally {
               setLoading(false);
             }
@@ -225,7 +225,7 @@ export default function PayType() {
               {/* remaining */}
               <div className="flex justify-between text-xs lg:text-xl sm:text-sm font-bold pt-1.5 border-t border-white/5">
                 <span>REMAINING DUE:</span>
-                <span className="font-mono text-purple-300">{remaining}€</span>
+                <span className="font-mono text-purple-300">{remaining.toFixed(2)}€</span>
               </div>
             </div>
             

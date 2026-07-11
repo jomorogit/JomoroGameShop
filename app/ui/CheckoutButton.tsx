@@ -22,16 +22,16 @@ export default function CheckoutButton() {
       const result = await createCheckoutSession();
 
       if (result?.error) {
-        showToast(`❌ ${result.error}`);
+        showToast(` ${result.error}`);
         return;
       }
       if (result?.url) {
-        showToast("🔄 Redirecting to secure payment...");
+        showToast("Redirecting to secure payment...");
         window.location.href = result.url; 
       }
     } catch (err) {
       console.error(err);
-      showToast("❌ Something went wrong. Please try again.");
+      showToast("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }

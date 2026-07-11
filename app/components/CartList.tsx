@@ -55,7 +55,7 @@ export default function CartList() {
             {isLoading ? (
                 <CartSkeleton />
             ) : (
-                <div className="lg:w-[70%] h-full">
+                <div className="lg:w-[95%] h-full">
                     {/* data.games — это массив, который отдает наш API */}
                      {data?.games?.map((game: GameCardProps, index: number) => (
                         <CartCardCreator 

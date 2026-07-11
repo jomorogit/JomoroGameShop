@@ -1,7 +1,7 @@
 'use client'
 import React from 'react'
 import useSWR from 'swr'; 
-import { Game } from '@prisma/client'; // Импортируем тип модели из Prisma
+import { Game } from '@prisma/client'; 
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -25,7 +25,7 @@ export default function CartSummuryData() {
 
     return (
         <div>
-            {/* Теперь используем Game вместо any */}
+           
             {data.games.map((game: Game) => (
                 <div key={game.id} className="flex justify-between mb-8">
                     <span className=''>{game.title}</span>

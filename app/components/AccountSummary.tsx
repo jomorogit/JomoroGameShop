@@ -8,21 +8,18 @@
     import AccountProfileName from "./AccountProfileName"
     import { unstable_cache } from 'next/cache';
 
-    const getUserData = unstable_cache(
-        async (email: string) => {
-            const user = await prisma.user.findUnique({
+   const getUserData = async (email: string) => {
+        const user = await prisma.user.findUnique({
             where: { email },
             select: { balance_eur: true, id: true }
-            });
-            
-            if (!user) return null;
+        });
 
-            const cartCount = await prisma.cart.count({ where: { user_id: user.id } });
-            return { balance: user.balance_eur, cartCount };
-        },
-        ['user-header-data'], // Ключ кэша
-        { tags: ['user-data'], revalidate: 60 } // Кэшируем на 60 секунд
-        );
+        if (!user) return null;
+
+        const cartCount = await prisma.cart.count({ where: { user_id: user.id } });
+        
+        return { balance: user.balance_eur, cartCount };
+        };
 
     export default async function Account() {
     const session = await getServerSession(authConfig);

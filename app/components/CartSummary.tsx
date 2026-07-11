@@ -25,7 +25,7 @@ export default function CartSummary() {
             {isLoading ? (
                 `Loading${dots}`
             ) : (
-                `${data?.summary || 0} €`
+                `${(data?.summary || 0).toFixed(2)} €`
             )}
         </span>
     );
