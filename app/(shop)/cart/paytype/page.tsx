@@ -225,7 +225,7 @@ export default function PayType() {
               {/* remaining */}
               <div className="flex justify-between text-xs lg:text-xl sm:text-sm font-bold pt-1.5 border-t border-white/5">
                 <span>REMAINING DUE:</span>
-                <span className="font-mono text-purple-300">{remaining.toFixed(2)}€</span>
+                <span className="font-mono text-purple-300">{remaining !== undefined ? `${remaining.toFixed(2)}€` : 'Loading...'}</span>
               </div>
             </div>
             
