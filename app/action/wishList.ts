@@ -69,7 +69,7 @@ export async function toggleWishList(gameID: number) {
         }
     });
     
-    console.log("Удалено!");
+   
 
         } else {
             // 5. ДОБАВЛЕНИЕ 
@@ -124,7 +124,6 @@ export async function OnlytoggleWishList(gameID: number) {
             game_id: gameID
         }
     });
-    console.log("Удалено!");
     }
 
         revalidatePath("/", "layout");

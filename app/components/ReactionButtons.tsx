@@ -23,7 +23,7 @@ export default function ReactionButtons({ reviewId, initialReaction }: ReactionB
         setIsLoading(true);
         
         if (!session?.user?.email) {
-            showToast("⚠️ Sign in to leave a reaction");
+            showToast(" Sign in to leave a reaction");
             setIsLoading(false);
             return;
         }
@@ -39,7 +39,7 @@ export default function ReactionButtons({ reviewId, initialReaction }: ReactionB
             setIsLike(initialReaction === 'LIKE');
             setIsDislike(initialReaction === 'DISLIKE');
         } else {
-            showToast("✅ Reaction updated");
+            showToast("Reaction updated");
         }
         
         setIsLoading(false);

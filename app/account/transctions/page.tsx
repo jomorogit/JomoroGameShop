@@ -23,7 +23,7 @@ export default async function page() {
   if (!session?.user?.email) {
     return (
       <div className="w-full text-center p-4">
-        <p className="text-red-500 font-bold">🚫 User is not authorized</p>
+        <p className="text-red-500 font-bold">User is not authorized</p>
       </div>
     );
   }

@@ -7,18 +7,17 @@ import { sendVerificationEmail } from "@/lib/mail";
 import bcrypt from "bcryptjs";
 
 
- // ЭТАП 1: Проверка учетных данных и генерация/отправка OTP-кода
+ // Проверка учетных данных и генерация/отправка OTP-кода
  
 export async function LoginValidation(formData: ISLoginData) {
     try {
-        // 1. Ищем пользователя по его email
         const existUser = await prisma.user.findFirst({
             where: {
                 email: formData.email,
             }
         });
 
-        // 2. Если пользователя нет или он авторизован через OAuth
+        // Если пользователя нет или он авторизован через OAuth
         if (!existUser || !existUser.password_hash) {
             console.log("Email not found or user signed up via Google");
             return { error: "Incorrect login or password" };
@@ -51,7 +50,7 @@ export async function LoginValidation(formData: ISLoginData) {
 }
 
 
- // ЭТАП 2: Валидация введенного кода, проверка лимита времени и удаление
+ // Валидация введенного кода, проверка лимита времени и удаление
  
 export async function CodeValidate(formData: ISLoginData) {
     try {
@@ -65,12 +64,12 @@ export async function CodeValidate(formData: ISLoginData) {
             }
         });
 
-        // 2. Если связка из кода и email не найдена в системе
+        // Если связка из кода и email не найдена в системе
         if (!verificationRecord) {
            return { error: "Code is not correct" }; 
         }
        
-        // 3. ЗАЩИТА: Проверяем, не вышло ли время жизни кода 
+        //  Проверяем, не вышло ли время жизни кода 
         const isExpired = new Date() > verificationRecord.expires;
         if (isExpired) {
             // Моментально стираем просроченный токен, чтобы освободить место 
@@ -80,7 +79,7 @@ export async function CodeValidate(formData: ISLoginData) {
             return { error: "Code has expired. Please request a new one." };
         }
 
-        // 4. ОДНОРАЗОВОСТЬ: Уничтожаем код сразу после успешного совпадения (защита от повторного входа)
+        // Уничтожаем код сразу после успешного совпадения (защита от повторного входа)
         await prisma.verificationToken.delete({
             where: { id: verificationRecord.id }
         });

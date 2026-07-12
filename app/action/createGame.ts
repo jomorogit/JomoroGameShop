@@ -7,8 +7,8 @@ import cloudinary from "@/lib/cloudinary";
 import { revalidateTag } from 'next/cache';
 
 /**
- * Преобразует строку в безопасный URL-slug.
- * Удаляет спецсимволы и заменяет пробелы на нижнее подчеркивание.
+ * Преобразует строку в безопасный URL-slug
+ * Удаляет спецсимволы и заменяет пробелы на нижнее подчеркивание
  */
 const slugify = (text: string) => {
     return text

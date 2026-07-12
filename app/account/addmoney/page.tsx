@@ -30,7 +30,7 @@ export default function AddMoney() {
     const finalAmount = Number(amount);
     
     if (!finalAmount || finalAmount <= 0) {
-      showToast("❌ Please enter a valid amount");
+      showToast("Please enter a valid amount");
       return;
     }
 
@@ -44,17 +44,17 @@ export default function AddMoney() {
       const result = await RefilMoney(finalAmount);
 
       if (result?.error) {
-        showToast(`❌ ${result.error}`);
+        showToast(` ${result.error}`);
         return;
       }
 
       if (result?.url) {
-        showToast("🔄 Redirecting to secure payment...");
+        showToast(" Redirecting to secure payment...");
         window.location.href = result.url; 
       }
     } catch (error) {
       console.error(error);
-      showToast("❌ Something went wrong. Please try again.");
+      showToast(" Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }

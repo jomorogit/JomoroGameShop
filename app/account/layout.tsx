@@ -18,7 +18,7 @@ export default function RegisterLayout({
       <ToastProvider>
       <ScrollToTop />
       
-      {/* Главный контейнер: использует ту же умную логику отступов, что и первый лейоут*/}
+     
       <div className="mainContainer relative flex min-h-screen w-full bg-[#1A0B22] overflow-x-hidden pb-16 md:pb-0
         [&:has([data-sidebar-open=true])]:lg:pl-[280px] 
         [&:has([data-sidebar-open=false])]:lg:pl-[70px] 
@@ -26,7 +26,7 @@ export default function RegisterLayout({
         transition-[padding] duration-300 ease-in-out"
       > 
         
-        {/* Левое меню (Сайдбар) */}
+        {/* Левое меню */}
         <LeftMenu />
 
         {/* Основной контент страницы: гибкий flex-1 исключает поломку сетки*/}

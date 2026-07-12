@@ -18,7 +18,7 @@ export default function DeletePageCardCreator({ id, title, price, image }: GameC
         const result = await DeleteGame(id)
         
         if (result.success) {
-            console.log("Игра удалена! 🗑️")
+            console.log("game deleted")
         } else {
             alert(result.error)
         }

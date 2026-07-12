@@ -70,10 +70,10 @@ export async function SetReaction(reaction: boolean | null, reviewId: number, sl
         // Валидация
         const session = await getServerSession(authConfig);
         if(!session?.user.email){
-            return {error: "⚠️Sign in to comment"};
+            return {error: "Sign in to comment"};
         }
         if(reaction == undefined){
-            return {error: "⚠️Reaction is undefined"};
+            return {error: "Reaction is undefined"};
         }
         
 

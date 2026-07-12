@@ -15,7 +15,7 @@ export default function UploadModal() {
 //  функция удаления аватара
 const handleDelete = async () => {
   // если нет подтвержения от пользователя что он хочет удалить аватар , то ничего не делаем
-  if (!confirm("Are you sure you want to delete your avatar? 🗑️")) return;
+  if (!confirm("Are you sure you want to delete your avatar?")) return;
   // если пользователь нажал что хочет удалить, то ставим загрузку
   setIsUploading(true);
   try {
@@ -35,7 +35,7 @@ const handleDelete = async () => {
 
       // обновляем данные компонентов
       router.refresh();
-      // возвращаем пользователя обратно на страницу (закрываем модалку)
+      // возвращаем пользователя обратно на страницу 
       router.back(); 
       // ловим ошибки сервера, если result не success
     } else {
@@ -44,7 +44,7 @@ const handleDelete = async () => {
     // ловии ошиьбки
   } catch (error) {
     console.error("Delete error:", error);
-    alert("Something went wrong ⚠️");
+    alert("Something went wrong");
   } finally {
     // в конце ставим загрузку на false чтобы кнопки снова работали
     setIsUploading(false);

@@ -51,7 +51,7 @@ const FormInput = ({ name, label, type = "text", required = false, multiple = fa
                     className="p-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none focus:border-purple-500 transition-all min-h-[220px] resize-none "
                 />
             ) : (
-                // Стандартное поле ввода (text, date, file, number)
+                // Стандартное поле ввода text, date, file, number
                 <input 
                     name={name}
                     type={type} 
@@ -71,8 +71,8 @@ const FormInput = ({ name, label, type = "text", required = false, multiple = fa
 
 // Корневой компонент страницы создания игры
 export default function CreateGame() {
-    const router = useRouter(); // Инициализация роутера Next.js для навигации
-    const [isLoading, setIsLoading] = useState(false); // Состояние сохранения данных в базу данных
+    const router = useRouter(); 
+    const [isLoading, setIsLoading] = useState(false); 
     
     // Состояние данных, генерируемых интеграцией с нейросетью
     const [aiData, setAiData] = useState({
@@ -112,8 +112,8 @@ export default function CreateGame() {
     });
 
     const [title, setTitle] = useState(""); // Состояние пользовательского ввода названия игры
-    const [showGeminiBtn, setShowGeminiBtn] = useState(false); // Флаг отображения компонента интеграции с Gemini API
-    const [isAiLoading, setIsAiLoading] = useState(false); // Состояние ожидания ответа
+    const [showGeminiBtn, setShowGeminiBtn] = useState(false); //Gemini API
+    const [isAiLoading, setIsAiLoading] = useState(false);
     const [genres, setGenres] = useState<Genre[]>([]); // Массив доступных жанров из репозитория БД
 
     // Задержка отображения кнопки автозаполнения debounce
@@ -175,7 +175,7 @@ export default function CreateGame() {
                     setAiData(prev => ({ ...prev, genres: genres.map(Number) }));
                 }
 
-                // Валидация формата даты (YYYY-MM-DD) перед записью в состояние
+                // Валидация формата даты (YYYY-MM-DD)
                 if (release_date && release_date.match(/^\d{4}-\d{2}-\d{2}$/)) {
                     setAiData(prev => ({ ...prev, release_date: release_date }));
                 } else {
@@ -306,7 +306,7 @@ export default function CreateGame() {
             formData.set('System_req_linux_minimal', JSON.stringify(System_req_linux_minimal));
             formData.set('System_req_linux_recommended', JSON.stringify(System_req_linux_recommended));
 
-            // Вызов серверного метода для сохранения сущности в БД (Prisma)
+            // Вызов серверного метода для сохранения сущности в БД 
             const result = await createGame(formData); 
             
             if (result?.success) {
@@ -340,9 +340,9 @@ export default function CreateGame() {
             let step = 0;
 
             interval = setInterval(() => {
-                step = (step + 1) % stages.length; // Циклический обход индексов массива
+                step = (step + 1) % stages.length;
                 setLoadingText(stages[step]);
-            }, 400); // Интервал обновления в миллисекундах
+            }, 400); 
         }
 
         return () => clearInterval(interval);
@@ -369,7 +369,7 @@ export default function CreateGame() {
             </div>
 
             <form action={handleFormSubmit} className='flex flex-col'>
-                {/* Сетка элементов ввода формы (двухколоночная для десктопных разрешений) */}
+                {/* Сетка элементов ввода формы */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10">
                     <div className="flex flex-col mb-6">
                         <label className="mb-2 text-white/50 text-xs uppercase tracking-widest ml-1">Game Title</label>
@@ -424,14 +424,14 @@ export default function CreateGame() {
 
                     <FormInput name="discount_percent" label="Discount %" type="number" defaultValue={0} isLoading={isLoading} />
                     
-                    {/* Элементы управления для загрузки бинарных файлов (изображений) */}
+                    {/* Элементы управления для загрузки бинарных файлов */}
                     <FormInput name="card_img" label="Card Image (Vertical)" type="file" required isLoading={isLoading} />
                     <FormInput name="main_img" label="Main Banner" type="file" required isLoading={isLoading} />
                     <FormInput name="about_game_img" label="About Section Image" type="file" required isLoading={isLoading} />
                     <FormInput name="game_images" label="Gallery Screenshots" type="file" required multiple isLoading={isLoading} />
                 </div>
 
-                {/* Блоки текстовых полей большой емкости (управляемые ИИ) */}
+                {/* Блоки текстовых полей большой емкости*/}
                 <FormInput 
                     name="game_description" 
                     label="Short Description" 

@@ -58,7 +58,7 @@ export async function createCheckoutSession() {
        metadata: {
          userId: session.user.id,
          type: 'purchase',
-         //ЗАЩИТА: Фиксируем ID игр в Stripe, чтобы их нельзя было подменить в процессе оплаты
+         // Фиксируем ID игр в Stripe, чтобы их нельзя было подменить в процессе оплаты
          gameIds: JSON.stringify(cartItems.map(item => item.game_id)), 
        },
        success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,

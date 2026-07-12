@@ -39,7 +39,7 @@ export default function LibraryItems({
           href={finalHref} 
           className="w-75 mb-10 block rounded-t-lg hover:scale-105 transition-transform hover:shadow-[0_0_20px_rgba(251,0,255,0.5)] transition-shadow duration-300"
         >
-            {/* Блок с картинкой снова дома! 🏠 🖼️ */}
+          
             <div className="relative h-70 w-full overflow-hidden rounded-t-lg"> 
                 <Image
                     src={image} 

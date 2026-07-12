@@ -70,19 +70,19 @@ export default function RemoveModal() {
           user: { ...session?.user, image: result.url },
         });
         //перезапускаем страницу с новыми данными от сервера, меняет аватарку на всех страницах
-        //он не делает F5, а просто обновляет данные компонентов 
+       
         router.refresh(); 
         //закрываем модалку и возвращаемся обратно
         router.back();    
       } else {
         //если сервер вернул ошибу , то выводим алерт с ошибкой
-        alert(result.error || "Ошибка загрузки ❌");
+        alert(result.error || "Upload error");
       }
       //ловим ошибки загрузки на фронтенде
     } catch (error) {
       //если случилась какая-то ошибка загрузки на фронте , то выводим её
       console.error("Upload error:", error);
-      alert("Непредвиденная ошибка ⚠️");
+      alert("Upload error ");
       //в конце ставим нашу загрузку на false , что значит что можем опять использовать кнопки
     } finally {
       setIsUploading(false);
