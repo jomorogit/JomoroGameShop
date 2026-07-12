@@ -4,10 +4,8 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { generateVerificationToken } from "@/lib/token";
 import { sendVerificationEmail } from "@/lib/mail";
-import { error } from "console";
 import { ISignUpData } from "@/lib/types";
 
-// 1. Проверка доступности емейла и пароля 
 export async function checkUserAvailability(email?: string, username?: string) {
     try {
         const existingUser = await prisma.user.findFirst({
@@ -20,12 +18,16 @@ export async function checkUserAvailability(email?: string, username?: string) {
         });
 
         if (existingUser) {
-            if (email && existingUser.email === email) return { error: "This Email is already taken!" };
-            if (username && existingUser.name === username) return { error: "Username is already taken!" };
+            if (email && existingUser.email === email){
+                return { error: "This Email is already taken!" };
+            } 
+            if (username && existingUser.name === username){
+              return { error: "Username is already taken!" };  
+            } 
         }
         return { success: true };
     } catch (error) {
-        return { error: "Validation error ❌" };
+        return { error: "Validation error" };
     }
 }
 
@@ -72,7 +74,7 @@ export async function registerUser(formData: ISignUpData) {
         });
 
         if (!existingToken) {
-            return { error: "Invalid code! ❌" };
+            return { error: "Invalid code!" };
         }
 
         // 2. Проверяем срок годности

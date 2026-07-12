@@ -34,7 +34,7 @@ export async function DeleteGame(id: number) {
         try {
             await cloudinary.api.delete_folder(folderPath);
         } catch (error) {
-            console.warn("Папка в Cloudinary не найдена или уже удалена ⚠️");
+            console.warn("Cloudinary file not found");
         }
 
         // 3. удаляем из базы данных
@@ -46,10 +46,10 @@ export async function DeleteGame(id: number) {
         return { success: true };
 
     } catch (error) {
-        console.error("DELETE ERROR ❌:", error);
+        console.error("DELETE ERROR:", error);
         return { 
             success: false, 
-            error: error || "DELETE ERROR ❌" 
+            error: error || "DELETE ERROR" 
         };
     }
 }

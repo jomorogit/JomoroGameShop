@@ -8,7 +8,7 @@ import { ISFrorgotData } from "@/lib/types";
 
 export async function emailValidate(formData:ISFrorgotData) {
     try{
-      const existUser = await prisma.user.findFirst({
+      const existUser = await prisma.user.findUnique({
         where: {
             email: formData.email,
         }
@@ -19,6 +19,7 @@ export async function emailValidate(formData:ISFrorgotData) {
     await prisma.verificationToken.deleteMany({
             where: { identifier: formData.email },
         });
+    
     
     const verificationToken = await generateVerificationToken(formData.email);
     await sendVerificationEmail(verificationToken.identifier, verificationToken.token);
@@ -37,7 +38,7 @@ export async function codeValidate(formData:ISFrorgotData) {
             where: {
                 identifier_token: { 
                     identifier: formData.email,
-                    token: formData.code // используем code
+                    token: formData.code 
                 }
             }
         })
@@ -54,7 +55,10 @@ export async function codeValidate(formData:ISFrorgotData) {
 export async function NewPassword(formData:ISFrorgotData) {
     
     try{
-        if (!formData.password) return { error: "Password is required!" };
+        if (!formData.password)
+            {
+               return { error: "Password is required!" }; 
+            } 
          const hashPassword = await bcrypt.hash(formData.password, 10);
         const updatePassword = await prisma.user.update({
             where: {
