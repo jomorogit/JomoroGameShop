@@ -6,11 +6,20 @@ import { generateVerificationToken } from "@/lib/token";
 import { sendVerificationEmail } from "@/lib/mail";
 import bcrypt from "bcryptjs";
 
+import { loginRateLimiter } from "@/lib/ratelimit";
+import { headers } from "next/headers";
 
- // Проверка учетных данных и генерация/отправка OTP-кода
  
 export async function LoginValidation(formData: ISLoginData) {
     try {
+        const headerList = await headers();
+        const ip = headerList.get("x-forwarded-for")?.split(",")[0] ?? "127.0.0.1";
+        
+        const { success: isLoginAllowed } = await loginRateLimiter.limit(`login_attempt_${ip}`);
+        if (!isLoginAllowed) {
+            return { error: "Too many login attempts. Please try again later." };
+        }
+
         const existUser = await prisma.user.findFirst({
             where: {
                 email: formData.email,
@@ -54,7 +63,14 @@ export async function LoginValidation(formData: ISLoginData) {
  
 export async function CodeValidate(formData: ISLoginData) {
     try {
-        // 1. Ищем токен по составному уникальному ключу (email + код)
+        const headerList = await headers();
+        const ip = headerList.get("x-forwarded-for")?.split(",")[0] ?? "127.0.0.1";
+        
+       const { success: isCodeAllowed } = await loginRateLimiter.limit(`code_attempt_${ip}`);
+        if (!isCodeAllowed) {
+            return { error: "Too many verification attempts. Please try again later." };
+        }
+
         const verificationRecord = await prisma.verificationToken.findUnique({
            where: {
                 identifier_token: { 
