@@ -38,6 +38,7 @@
 * **NextAuth**
 * **Cloudinary**
 * **Gemini API**
+* **Redis** Rate Limiting
 * **Deployment:** Vercel
   
 
