@@ -12,7 +12,7 @@ export default function ShopLayout({
   return (
     <Provider>
       <ToastProvider>
-        <div className="mainContainer relative flex min-h-screen w-full bg-[#1A0B22] overflow-x-hidden lg:pl-[17.5] [&:has([data-sidebar-open=true])]:lg:pl-[280px] transition-[padding] duration-300 ease-in-out">
+        <div className="mainContainer relative flex min-h-screen w-full bg-[#1A0B22] overflow-x-hidden lg:pl-[70px] [&:has([data-sidebar-open=true])]:lg:pl-[280px] transition-[padding] duration-300 ease-in-out">
           <LeftMenu />
           <div className="w-full flex-1 min-w-0 flex flex-col">
             <header className="flex items-center justify-between px-6 md:px-32 lg:px-10 py-1 md:py-5 w-full gap-4">
