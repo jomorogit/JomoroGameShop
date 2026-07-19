@@ -40,8 +40,12 @@ export const metadata: Metadata = {
   description: "Discover and buy the latest video games, Steam keys, and digital activation codes at the best prices. Instant digital delivery and secure checkout.",
 
   alternates: {
-    canonical: "/", 
+  canonical: "/",
+  languages: {
+    "en-US": "https://jomoro-game-shop.vercel.app",
+    "x-default": "https://jomoro-game-shop.vercel.app",
   },
+},
 
   robots: {
     index: true,
@@ -83,6 +87,8 @@ export const metadata: Metadata = {
     title: "JomoroGameShop — Buy Game Keys",
     description: "Discover and buy the latest video games with instant delivery.",
     images: ["./icons/icon.png"],
+    site: "@JomoroGameShop",     
+    creator: "@JomoroGameShop", 
   },
 };
 
