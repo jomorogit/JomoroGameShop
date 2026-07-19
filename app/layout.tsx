@@ -28,6 +28,10 @@ const inder = Inder({
 
 
 export const metadata: Metadata = {
+
+  metadataBase: new URL("https://jomoro-game-shop.vercel.app"),
+
+
   title: {
     default: "JomoroGameShop — Buy Game Keys & Digital Games",
     template: "%s | JomoroGameShop", 
@@ -35,6 +39,21 @@ export const metadata: Metadata = {
   
   description: "Discover and buy the latest video games, Steam keys, and digital activation codes at the best prices. Instant digital delivery and secure checkout.",
 
+  alternates: {
+    canonical: "/", 
+  },
+
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
 
   icons: {
     icon: "./icons/icon.ico", 

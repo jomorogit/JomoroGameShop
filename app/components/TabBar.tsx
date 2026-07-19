@@ -58,7 +58,7 @@ export default function TabBar() {
                     </button>
                 )}
                 <div className='w-full h-24 bg-[#130a22] flex justify-center items-center border-b border-white/5'>
-                    <h1 className='text-2xl font-semibold text-gray-200 tracking-wide'>Menu</h1>
+                    <span className='text-2xl font-semibold text-gray-200 tracking-wide'>Menu</span>
                 </div>
                 
                 <div className="flex flex-col gap-4 p-5">

@@ -1,7 +1,3 @@
-// app/layout.tsx
-import { getServerSession } from "next-auth";
-import { authConfig } from "../configs/auth";
-import { prisma } from "@/lib/prisma";
 import { Provider } from "../components/Provider";
 import { ToastProvider } from "../components/Toast";
 import TabBar from "../components/TabBar";
