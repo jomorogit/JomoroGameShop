@@ -56,10 +56,12 @@ export default function MainPageGameCreator({
                     src={image} 
                     alt={title || "game cover"}
                     fill 
-                    // priority={true} 
+                    // priority 
+                    
+                    sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 200px" 
                     className="object-cover transition-transform duration-300 hover:scale-105" 
-                    sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 20vw" 
-                />
+                    quality={70}
+                    />
             </div>
                         
             {/* Нижняя контентная часть карточки */}

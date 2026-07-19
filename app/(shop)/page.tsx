@@ -1,6 +1,5 @@
-// app/page.tsx
 import Image from "next/image";
-import SilkSong from "./img/Game1.webp"; 
+// import SilkSong from "./img/Game1.webp"; 
 import Link from "next/link";
 import HomePageList from "../components/HomePageList";
 import { Suspense } from 'react';
@@ -14,13 +13,13 @@ export default async function Home() {
       >
         {/* Картинка-фон */}
         <Image 
-          src={SilkSong} 
+          src="https://res.cloudinary.com/dla93ueam/image/upload/v1784493980/Game1_jbylpz.webp"
           alt="Hollow Knight Silksong"
           fill 
-          priority={true} 
+          priority
           fetchPriority="high"
-          className="object-cover object-center -z-10" 
-          sizes="100vw"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
+          className="object-cover object-center -z-10"
         />
 
         <div className="relative z-10 pl-6 md:pl-15 flex flex-col h-full justify-center bg-gradient-to-r from-black/50 via-transparent to-transparent">

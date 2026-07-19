@@ -7,20 +7,63 @@ import Script from "next/script";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: 'swap',
 });
 
 const inder = Inder({
   weight: "400", 
   subsets: ["latin"],
   variable: "--font-inder", 
+  display: 'swap',
 });
 
+// export const metadata: Metadata = {
+//   title: "GameShop",
+//   description: "Your ultimate game store",
+//   icons: {
+//     icon: './icons/icon.ico', 
+//     apple: './icons/icon.ico',  
+//   },
+// };
+
+
 export const metadata: Metadata = {
-  title: "GameShop",
-  description: "Your ultimate game store",
+  title: {
+    default: "JomoroGameShop — Buy Game Keys & Digital Games",
+    template: "%s | JomoroGameShop", 
+  },
+  
+  description: "Discover and buy the latest video games, Steam keys, and digital activation codes at the best prices. Instant digital delivery and secure checkout.",
+
+
   icons: {
-    icon: './icons/icon.ico', 
-    apple: './icons/icon.ico',  
+    icon: "./icons/icon.ico", 
+    apple: "./icons/icon.ico",  
+  },
+
+  openGraph: {
+    title: "JomoroGameShop — Buy Game Keys & Digital Games",
+    description: "Discover and buy the latest video games and Steam keys with instant delivery.",
+    url: "https://jomoro-game-shop.vercel.app",
+    siteName: "JomoroGameShop",
+    locale: "en_US",
+    type: "website",
+    images: [
+      {
+        url: "./icons/icon.png", 
+        width: 1200,
+        height: 630,
+        alt: "JomoroGameShop Banner",
+      },
+    ],
+  },
+
+  // Настройки для Twitter
+  twitter: {
+    card: "summary_large_image",
+    title: "JomoroGameShop — Buy Game Keys",
+    description: "Discover and buy the latest video games with instant delivery.",
+    images: ["./icons/icon.png"],
   },
 };
 
