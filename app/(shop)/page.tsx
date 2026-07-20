@@ -25,9 +25,9 @@ export default async function Home() {
         <div className="relative z-10 pl-6 md:pl-15 flex flex-col h-full justify-center bg-gradient-to-r from-black/50 via-transparent to-transparent">
           <h2 className="mb-2 md:mb-5 text-sm md:text-base text-white/80">Release Date 4 Sep, 2025</h2>
           <h1 className="mb-4 md:mb-5 text-2xl md:text-4xl text-white font-bold leading-tight">
-          Hollow Knight:
-          <span className="block">Silksong</span>
-        </h1>
+             Hollow Knight:{" "}
+            <span className="block">Silksong</span>
+          </h1>
           
           <Link 
             href="/1-hollow-knight-silksong/" 

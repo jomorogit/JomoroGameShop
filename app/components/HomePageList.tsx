@@ -5,7 +5,9 @@ export default async function HomePageList() {
       const games = await getCachedGames();
   return (
      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 md:gap-8">
-         {games.map((game: typeof games[number]) => {
+         {games
+         .filter((game) => game.id !== 1)
+         .map((game: typeof games[number]) =>  {
                 
                     return (
                       <HomeItem 
